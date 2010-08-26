@@ -27,8 +27,6 @@
  */
 
 #include "arm_asm.h"
-#include <_ansi.h>
-#include <string.h>
 
 #ifdef __thumb2__
 #define magic1(REG) "#0x01010101"

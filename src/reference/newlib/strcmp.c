@@ -27,8 +27,6 @@
  */
 
 #include "arm_asm.h"
-#include <_ansi.h>
-#include <string.h>
 
 #ifdef __ARMEB__
 #define SHFT2LSB "lsl"

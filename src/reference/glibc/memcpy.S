@@ -18,8 +18,6 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sysdep.h>
-
 /*
  * Data preload for architectures that support it (ARM V5TE and above)
  */
@@ -55,7 +53,7 @@
 
 /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
 
-ENTRY(memcpy)
+memcpy:
 
 		stmfd	sp!, {r0, r4, lr}
 
@@ -227,6 +225,3 @@ ENTRY(memcpy)
 17:		forward_copy_shift	pull=16	push=16
 
 18:		forward_copy_shift	pull=24	push=8
-
-END(memcpy)
-libc_hidden_builtin_def (memcpy)

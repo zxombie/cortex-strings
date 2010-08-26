@@ -26,10 +26,9 @@
  * SUCH DAMAGE.
  */
 
-#include <machine/cpu-features.h>
+#define __ARM_NEON__
 
 #if defined(__ARM_NEON__)
-
         .text
         .fpu    neon
 

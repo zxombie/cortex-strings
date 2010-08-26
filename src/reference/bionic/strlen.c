@@ -27,7 +27,8 @@
  */
 #include <string.h>
 #include <stdint.h>
-#include <machine/cpu-features.h>
+
+#define __ARM_HAVE_PLD  1
 
 size_t strlen(const char *s)
 {

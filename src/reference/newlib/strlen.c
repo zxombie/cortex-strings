@@ -27,9 +27,8 @@
  */
 
 #include "arm_asm.h"
-#include <_ansi.h>
-#include <string.h>
 #include <limits.h>
+#include <stddef.h>
 
 #if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
   (defined (__thumb__) && !defined (__thumb2__))

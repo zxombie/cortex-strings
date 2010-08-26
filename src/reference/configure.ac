@@ -3,4 +3,5 @@ AM_INIT_AUTOMAKE(foreign subdir-objects)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile)
 AC_PROG_LIBTOOL
+AM_PROG_AS
 AC_OUTPUT

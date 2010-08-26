@@ -17,14 +17,12 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sysdep.h>
-
 /* size_t strlen(const char *S)
  * entry: r0 -> string
  * exit: r0 = len
  */
 
-ENTRY(strlen)
+strlen:	
 	bic     r1, r0, $3              @ addr of word containing first byte
 	ldr     r2, [r1], $4            @ get the first word
 	ands    r3, r0, $3              @ how many bytes are duff?
@@ -68,6 +66,5 @@ Llastword:				@ drop through to here once we find a
 	tstne   r2, $0x00ff0000         @ (if first three all non-zero, 4th
 	addne   r0, r0, $1              @  must be zero)
 #endif
-	DO_RET(lr)
-END(strlen)
-libc_hidden_builtin_def (strlen)
+	bx lr
+	
