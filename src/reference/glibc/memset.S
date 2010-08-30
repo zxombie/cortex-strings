@@ -17,11 +17,9 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sysdep.h>
-
 /* void *memset (dstpp, c, len) */
 
-ENTRY(memset)
+memset:	
 	mov	r3, r0
 	cmp	r2, #8
 	bcc	2f		@ less than 8 bytes to move
@@ -60,6 +58,4 @@ ENTRY(memset)
 	strcsb	r1, [r3], #1
 	bcs	2b
 	
-	DO_RET(lr)
-END(memset)
-libc_hidden_builtin_def (memset)
+	bx	lr

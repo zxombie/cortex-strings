@@ -5,8 +5,6 @@ lib_LTLIBRARIES = \
 	libnewlib.la \
 	libglibc.la
 
-#libbionic.la #libglibc.a libnewlib.a
-
 libbionic_la_SOURCES = \
 	bionic/memcpy.S \
 	bionic/strlen.c
@@ -20,7 +18,14 @@ libnewlib_la_SOURCES = \
 	newlib/strcpy.c \
 	newlib/strlen.c
 
+libhelpers_la_SOURCES = \
+	helpers/bounce.c \
+	helpers/spawn.c
+
+libplain_la_SOURCES = \
+	plain/memcpy.c \
+	plain/strcpy.c \
+	plain/strcmp.c
+
 AM_CFLAGS = -std=gnu99
 
-libhelpers_la_SOURCES = helpers/bounce.c helpers/spawn.c
-libplain_la_SOURCES = plain/memcpy.c

@@ -18,8 +18,6 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sysdep.h>
-
 /*
  * Data preload for architectures that support it (ARM V5TE and above)
  */
@@ -62,15 +60,10 @@
  * normally a bit faster. Otherwise the copy is done going downwards.
  */
 
-ENTRY(memmove)
-
+memmove:
 		subs	ip, r0, r1
 		cmphi	r2, ip
-#ifdef NOT_IN_libc
 		bls	memcpy
-#else
-		bls	HIDDEN_JUMPTARGET(memcpy)
-#endif
 
 		stmfd	sp!, {r0, r4, lr}
 		add	r1, r1, r2
@@ -240,7 +233,3 @@ ENTRY(memmove)
 17:		backward_copy_shift	push=16	pull=16
 
 18:		backward_copy_shift	push=24	pull=8
-
-
-END(memmove)
-libc_hidden_builtin_def (memmove)

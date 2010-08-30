@@ -26,8 +26,6 @@
  * SUCH DAMAGE.
  */
 
-#define __ARM_NEON__
-
 #if defined(__ARM_NEON__)
         .text
         .fpu    neon
