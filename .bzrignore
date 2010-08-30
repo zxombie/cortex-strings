@@ -11,3 +11,5 @@ depcomp
 install-sh
 ltmain.sh
 missing
+obj
+test-*
