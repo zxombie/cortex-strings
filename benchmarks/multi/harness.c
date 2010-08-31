@@ -1,17 +1,32 @@
 #include <string.h>
-#include <sys/time.h>
+#include <time.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <assert.h>
+#include <unistd.h>
 
+#define QUOTEME_(x) #x
+#define QUOTEME(x) QUOTEME_(x)
+
+#define NUM_ELEMS(_x) (sizeof(_x) / sizeof((_x)[0]))
+
+#ifndef VERSION
+#define VERSION "(unknown version)"
+#endif
+
+static const char* version = QUOTEME(VERSION);
+
+/** Current wall time in seconds */
 static double now()
 {
-  struct timeval tv;
+  struct timespec ts;
 
-  gettimeofday(&tv, NULL);
+  int err = clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+  assert(err == 0);
 
-  return tv.tv_sec + tv.tv_usec * 1e-6;
+  return ts.tv_sec + ts.tv_nsec * 1e-9;
 }
 
 static int get_arg(int argc, char **argv, int idx, int fallback)
@@ -39,19 +54,60 @@ static void empty(volatile char *against)
     }
 }
 
-static void __attribute__((noinline)) xmemcpy(char *dest, char *src, size_t n)
+static void xbounce(void *dest, void *src, size_t n)
+{
+}
+
+static void xmemcpy(void *dest, void *src, size_t n)
 {
   memcpy(dest, src, n);
 }
 
-static void __attribute__((noinline)) xstrcpy(char *dest, char *src)
+static void xmemset(void *dest, void *src, size_t n)
+{
+  memset(dest, 0, n);
+}
+
+static void xstrcpy(void *dest, void *src, size_t n)
 {
   strcpy(dest, src);
 }
 
-static void __attribute__((noinline)) xmemset(void *dest, int c, size_t n)
+static void xstrlen(void *dest, void *src, size_t n)
 {
-  memset(dest, c, n);
+  (void)strlen(dest);
+}
+
+static void xstrcmp(void *dest, void *src, size_t n)
+{
+  strcmp(dest, src);
+}
+
+typedef void (*stub_t)(void *dest, void *src, size_t n);
+
+struct test
+{
+  const char *name;
+  stub_t stub;
+};
+
+static const struct test tests[] =
+{
+  { "memcpy", xmemcpy },
+  { "memset", xmemset },
+  { "strcpy", xstrcpy },
+  { "strlen", xstrlen },
+  { "strcmp", xstrcmp },
+  { "bounce", xbounce },
+  { NULL }
+};
+
+static void usage(const char* name)
+{
+  printf("%s %s: run a string related benchmark.\n"
+	 "usage: %s [-c block-size] [-l loop-count] [-f] [-t test-name]\n"
+	 , name, version, name);
+  exit(-1);
 }
 
 int main(int argc, char **argv)
@@ -59,32 +115,83 @@ int main(int argc, char **argv)
   char *src = calloc(1024, 1024);
   char *dest = calloc(1024, 1024);
 
+  assert(src != NULL && dest != NULL);
+
   srandom(1539);
 
   for (int i = 0; i < 16*1024; i++)
     {
       src[i] = (char)random() | 1;
+      dest[i] = src[i];
     }
 
-  int count = get_arg(argc, argv, 1, 31);
-  int loops = get_arg(argc, argv, 2, 10000000);
-  int flush = get_arg(argc, argv, 3, 0);
+  int test_id = get_arg(argc, argv, 1, 0);
+  assert(test_id >= 0 && test_id <= NUM_ELEMS(tests));
+
+  int count = 31;
+  int loops = 10000000;
+  int flush = 0;
+  const char *name = NULL;
+  int opt;
+
+  while ((opt = getopt(argc, argv, "c:l:ft:hv")) > 0)
+    {
+      switch (opt)
+	{
+	case 'c':
+	  count = atoi(optarg);
+	  break;
+	case 'l':
+	  loops = atoi(optarg);
+	  break;
+	case 'f':
+	  flush = 1;
+	  break;
+	case 't':
+	  name = strdup(optarg);
+	  break;
+	case 'h':
+	  usage(argv[0]);
+	  break;
+	default:
+	  usage(argv[0]);
+	  break;
+	}
+    }
+
+  const struct test *ptest = NULL;
+
+  if (name == NULL)
+    {
+      ptest = tests + 0;
+    }
+  else
+    {
+      for (const struct test *p = tests; p->name != NULL; p++)
+	{
+	  if (strcmp(p->name, name) == 0)
+	    {
+	      ptest = p;
+	      break;
+	    }
+	}
+    }
+
+  if (ptest == NULL)
+    {
+      usage(argv[0]);
+    }
+
+  stub_t stub = ptest->stub;
 
   src[count] = 0;
+  dest[count] = 0;
 
   double start = now();
 
   for (int i = 0; i < loops; i++)
     {
-#if defined(WITH_MEMCPY)
-      xmemcpy(dest, src, count);
-#elif defined(WITH_STRCPY)
-      xstrcpy(dest, src);
-#elif defined(WITH_MEMSET)
-      xmemset(src, 0, count);
-#else
-#error
-#endif
+      (*stub)(dest, src, count);
 
       if (flush != 0)
 	{
@@ -95,8 +202,7 @@ int main(int argc, char **argv)
   double end = now();
   double elapsed = end - start;
 
-  printf("%.3f for %u loops of %u bytes.  %.3f MB/s\n", elapsed, loops, count, (double)loops*count/elapsed/(1024*1024));
+  printf("%s: %s: %.3f for %u loops of %u bytes.  %.3f MB/s\n", QUOTEME(VARIANT), ptest->name, elapsed, loops, count, (double)loops*count/elapsed/(1024*1024));
 
   return 0;
 }
-

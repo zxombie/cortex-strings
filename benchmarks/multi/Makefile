@@ -1,18 +1,18 @@
-CFLAGS = -O2 -g -Wall -save-temps -std=gnu99 -mfpu=neon
-CFLAGS += -DWITH_MEMSET
+CFLAGS = -O2 -g -Wall -save-temps -std=gnu99 -mfpu=neon -lrt
 
-V = null libc bionic glibc newlib plain linaro csl
-REF = ../../src/reference
+VARIANTS = libc bionic glibc newlib plain linaro csl
+REF = ../../reference
+VERSION := $(shell bzr version-info --custom --template "{revno} ({date})")
 
-all:
-	for i in $(V); do $(MAKE) sub S=$$i; done
+all: $(VARIANTS:%=build-%)
 
-sub: test-$(S)
+build-%:
+	$(MAKE) test-$* VARIANT=$*
 
-test-$(S): harness.c $(wildcard $(REF)/$(S)/*.c) $(wildcard $(REF)/$(S)/*.S)
-	$(CC) $(CFLAGS) -o $@ $^
-	mkdir -p obj/$(S)
-	mv -f *.s *.o *.i obj/$(S)
+test-$(VARIANT): harness.c $(wildcard $(REF)/$(VARIANT)/*.c) $(wildcard $(REF)/$(VARIANT)/*.S)
+	$(CC) $(CFLAGS) -DVERSION="$(VERSION)" -DVARIANT=$(VARIANT) -o $@ $^
+	mkdir -p obj/$(VARIANT)
+	mv -f *.s *.o *.i obj/$(VARIANT)
 
 clean:
-	rm -rf $(V:%=test-%) *.o *.s *.i obj
+	rm -rf $(VARIANTS:%=test-%) *.o *.s *.i obj
