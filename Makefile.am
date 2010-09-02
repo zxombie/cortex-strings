@@ -18,6 +18,7 @@ check_PROGRAMS = \
 # Benchmarks and example programs
 noinst_PROGRAMS = \
 	dhry \
+	dhry-native \
 	try-bionic \
 	try-csl \
 	try-glibc \
@@ -34,7 +35,7 @@ noinst_LIBRARIES = \
 	libmulti.a
 
 # Main library
-libcortexcpu_la_SOURCES = 
+libcortexcpu_la_SOURCES = \
 	src/neon/memcpy.S \
 	src/neon/memset.S \
 	src/thumb-2/strcmp.c \
@@ -112,6 +113,10 @@ dhry_SOURCES = \
 	benchmarks/dhry/dhry_2.c
 
 dhry_CFLAGS = -Dcompiler="\"$(COMPILER)\"" -Doptions="\"$(CFLAGS)\""
+dhry_LDADD = libcortexcpu.la
+
+dhry_native_SOURCES = $(dhry_SOURCES)
+dhry_native_CFLAGS = $(dhry_CFLAGS)
 
 AM_CFLAGS = -std=gnu99 -mfpu=neon -Wall
 AM_CPPFLAGS = -mfpu=neon
