@@ -1,0 +1,47 @@
+= Cortex-A String Routines =
+
+This package contains optimised string routines including memcpy(),
+memset(), strcpy(), strlen(), and strcmp() for the ARM Cortex-A series
+of processors.  Variants are available for the Cortex-A8 and
+Cortex-A9, as well as variants that make use of the optional NEON
+unit.
+
+== Getting started ==
+These routines can be used either stand-alone or as a GLIBC add-on.
+
+To use them stand-alone, first configure and then install
+libcortexcpu.so.  To make other applications use this library, either
+add -lcortexcpu to the link command or use LD_PRELOAD to load the
+library into existing applications.
+
+To use them as a GLIBC add-on, first configure and run `make add-on`
+to generate cortexcpu.tar.  Extract this into the GLIBC source
+directory, enable the add-on using `--enable-add-ons=cortexcpu` and
+`--with-cpu=cortex-a8`, build GLIBC, and install.
+
+== Contents ==
+ * src/  contains the routines themselves
+ * tests/  contains the unit tests
+ * reference/  contains reference copies of other ARM-focused
+   implementations gathered from around the Internet
+ * benchmarks/  contains various benchmarks, tools, and scripts used to
+   check and report on the different implementations.
+
+The src directory contains different variants organised by the
+implementation they run on and optional features used.  For example:
+  * src/thumb-2  contains generic non-NEON routines for all processors
+  * src/neon for  contains NEON based routines for all processors
+  * src/cortex-a8/neon  for NEON-based routines especially optimised for the A8
+
+== History ==
+
+== Licensing ==
+The routines are currently under the modified BSD and simplified BSD.
+
+== Notes and Limitations ==
+This is an early release that contains Cortex-A8 with NEON focused
+routines.  Most of the implementations have been collected from other
+projects and have a variety of licenses and copyright holders.  Future
+releases are intended to tidy this up.
+
+The GLIBC add-on generates a cortex-a8 add-on only.

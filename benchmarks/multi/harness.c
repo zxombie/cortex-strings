@@ -117,6 +117,9 @@ int main(int argc, char **argv)
 
   assert(src != NULL && dest != NULL);
 
+  char *variant = strrchr(argv[0], '-');
+  assert(variant != NULL);
+
   srandom(1539);
 
   for (int i = 0; i < 16*1024; i++)
@@ -202,7 +205,7 @@ int main(int argc, char **argv)
   double end = now();
   double elapsed = end - start;
 
-  printf("%s: %s: %.3f for %u loops of %u bytes.  %.3f MB/s\n", QUOTEME(VARIANT), ptest->name, elapsed, loops, count, (double)loops*count/elapsed/(1024*1024));
+  printf("%s: %s: %.3f for %u loops of %u bytes.  %.3f MB/s\n", variant + 1, ptest->name, elapsed, loops, count, (double)loops*count/elapsed/(1024*1024));
 
   return 0;
 }
