@@ -1,15 +1,30 @@
+# Top level Makefile for cortexcpu
+
+# Used to record the compiler version in the executables
 COMPILER = $(shell $(CC) --version 2>&1 | head -n1)
 
+# The main library
 lib_LTLIBRARIES = \
 	libcortexcpu.la
 
-sources = \
-	src/neon/memcpy.S \
-	src/neon/memset.S \
-	src/thumb-2/strcmp.c \
-	src/thumb-2/strcpy.c \
-	src/thumb-2/strlen.c
+# Test suite
+check_PROGRAMS = \
+	tests/test-memcpy \
+	tests/test-memset \
+	tests/test-strcmp \
+	tests/test-strcpy \
+	tests/test-strlen
 
+# Benchmarks and example programs
+noinst_PROGRAMS = \
+	dhry \
+	try-bionic \
+	try-csl \
+	try-glibc \
+	try-newlib \
+	try-plain
+
+# Libraries used in the benchmarks and examples
 noinst_LIBRARIES = \
 	libbionic.a \
 	libcsl.a \
@@ -18,6 +33,29 @@ noinst_LIBRARIES = \
 	libplain.a \
 	libmulti.a
 
+# Main library
+libcortexcpu_la_SOURCES = 
+	src/neon/memcpy.S \
+	src/neon/memset.S \
+	src/thumb-2/strcmp.c \
+	src/thumb-2/strcpy.c \
+	src/thumb-2/strlen.c
+
+# Options for the tests
+tests_test_memcpy_LDADD = libcortexcpu.la
+tests_test_memcpy_CFLAGS = -Itests $(AM_CFLAGS)
+tests_test_memset_LDADD = libcortexcpu.la
+tests_test_memset_CFLAGS = -Itests $(AM_CFLAGS)
+tests_test_strcmp_LDADD = libcortexcpu.la
+tests_test_strcmp_CFLAGS = -Itests $(AM_CFLAGS)
+tests_test_strcpy_LDADD = libcortexcpu.la
+tests_test_strcpy_CFLAGS = -Itests $(AM_CFLAGS)
+tests_test_strlen_LDADD = libcortexcpu.la
+tests_test_strlen_CFLAGS = -Itests $(AM_CFLAGS)
+
+TESTS = $(check_PROGRAMS)
+
+# Libraries containing the difference reference versions
 libbionic_a_SOURCES = \
 	reference/bionic/memcmp.S \
 	reference/bionic/memcmp16.S \
@@ -49,18 +87,9 @@ libplain_a_SOURCES = \
 libmulti_a_SOURCES = \
 	benchmarks/multi/harness.c
 
-noinst_PROGRAMS = \
-	dhry \
-	try-bionic \
-	try-csl \
-	try-glibc \
-	try-newlib \
-	try-plain
+libmulti_a_CFLAGS = -DVERSION=$(VERSION) $(AM_CFLAGS)
 
-dhry_SOURCES = \
-	benchmarks/dhry/dhry_1.c \
-	benchmarks/dhry/dhry_2.c
-
+# Flags for the benchmark helpers
 try_bionic_SOURCES =
 try_bionic_LDFLAGS = -lrt
 try_bionic_LDADD = libmulti.a libbionic.a
@@ -77,30 +106,12 @@ try_plain_SOURCES =
 try_plain_LDFLAGS = -lrt
 try_plain_LDADD = libmulti.a libplain.a
 
+# Good 'ol Dhrystone
+dhry_SOURCES = \
+	benchmarks/dhry/dhry_1.c \
+	benchmarks/dhry/dhry_2.c
+
 dhry_CFLAGS = -Dcompiler="\"$(COMPILER)\"" -Doptions="\"$(CFLAGS)\""
 
-libcortexcpu_la_SOURCES = $(sources)
-
-check_PROGRAMS = \
-	tests/test-memcpy \
-	tests/test-memset \
-	tests/test-strcmp \
-	tests/test-strcpy \
-	tests/test-strlen
-
-tests_test_memcpy_LDADD = libcortexcpu.la
-tests_test_memcpy_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_memset_LDADD = libcortexcpu.la
-tests_test_memset_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strcmp_LDADD = libcortexcpu.la
-tests_test_strcmp_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strcpy_LDADD = libcortexcpu.la
-tests_test_strcpy_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strlen_LDADD = libcortexcpu.la
-tests_test_strlen_CFLAGS = -Itests $(AM_CFLAGS)
-
-TESTS = $(check_PROGRAMS)
-
-AM_CFLAGS = -std=gnu99 -mfpu=neon
+AM_CFLAGS = -std=gnu99 -mfpu=neon -Wall
 AM_CPPFLAGS = -mfpu=neon
-

@@ -1,3 +1,9 @@
+/** A simple harness that times how long a string function takes to
+ * run.
+ */
+
+/* PENDING: Add EPL */
+
 #include <string.h>
 #include <time.h>
 #include <stdint.h>
@@ -7,40 +13,25 @@
 #include <assert.h>
 #include <unistd.h>
 
-#define QUOTEME_(x) #x
-#define QUOTEME(x) QUOTEME_(x)
-
 #define NUM_ELEMS(_x) (sizeof(_x) / sizeof((_x)[0]))
 
 #ifndef VERSION
 #define VERSION "(unknown version)"
 #endif
 
-static const char* version = QUOTEME(VERSION);
+/** Type of functions that can be tested */
+typedef void (*stub_t)(void *dest, void *src, size_t n);
 
-/** Current wall time in seconds */
-static double now()
+/** Meta data about one test */
+struct test
 {
-  struct timespec ts;
+  /** Test name */
+  const char *name;
+  /** Function to test */
+  stub_t stub;
+};
 
-  int err = clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-  assert(err == 0);
-
-  return ts.tv_sec + ts.tv_nsec * 1e-9;
-}
-
-static int get_arg(int argc, char **argv, int idx, int fallback)
-{
-  if (argc > idx)
-    {
-      return atoi(argv[idx]);
-    }
-  else
-    {
-      return fallback;
-    }
-}
-
+/** Flush the cache by reading a chunk of memory */
 static void empty(volatile char *against)
 {
   /* We know that there's a 16 k cache with 64 byte lines giving
@@ -54,43 +45,42 @@ static void empty(volatile char *against)
     }
 }
 
+/** Stub that does nothing.  Used for calibrating */
 static void xbounce(void *dest, void *src, size_t n)
 {
 }
 
+/** Stub that calls memcpy */
 static void xmemcpy(void *dest, void *src, size_t n)
 {
   memcpy(dest, src, n);
 }
 
+/** Stub that calls memset */
 static void xmemset(void *dest, void *src, size_t n)
 {
   memset(dest, 0, n);
 }
 
+/** Stub that calls strcpy */
 static void xstrcpy(void *dest, void *src, size_t n)
 {
   strcpy(dest, src);
 }
 
+/** Stub that calls strlen */
 static void xstrlen(void *dest, void *src, size_t n)
 {
   (void)strlen(dest);
 }
 
+/** Stub that calls strcmp */
 static void xstrcmp(void *dest, void *src, size_t n)
 {
-  strcmp(dest, src);
+  (void)strcmp(dest, src);
 }
 
-typedef void (*stub_t)(void *dest, void *src, size_t n);
-
-struct test
-{
-  const char *name;
-  stub_t stub;
-};
-
+/** All functions that can be tested */
 static const struct test tests[] =
 {
   { "memcpy", xmemcpy },
@@ -102,24 +92,56 @@ static const struct test tests[] =
   { NULL }
 };
 
+/** Show basic usage */
 static void usage(const char* name)
 {
   printf("%s %s: run a string related benchmark.\n"
 	 "usage: %s [-c block-size] [-l loop-count] [-f] [-t test-name]\n"
-	 , name, version, name);
+	 , name, VERSION, name);
+
+  printf("Tests:");
+
+  for (const struct test *ptest = tests; ptest->name != NULL; ptest++)
+    {
+      printf(" %s", ptest->name);
+    }
+
+  printf("\n");
+
   exit(-1);
 }
 
+/** Find the test by name */
+static const struct test *find_test(const char *name)
+{
+  if (name == NULL)
+    {
+      return tests + 0;
+    }
+  else
+    {
+      for (const struct test *p = tests; p->name != NULL; p++)
+	{
+	  if (strcmp(p->name, name) == 0)
+	    {
+	      return p;
+	    }
+	}
+    }
+
+  return NULL;
+}
+
+/** Setup and run a test */
 int main(int argc, char **argv)
 {
+  /* Buffers to read and write from */
   char *src = calloc(1024, 1024);
   char *dest = calloc(1024, 1024);
 
   assert(src != NULL && dest != NULL);
 
-  char *variant = strrchr(argv[0], '-');
-  assert(variant != NULL);
-
+  /* Fill the first 16 k with non-zero, reproducable random data */
   srandom(1539);
 
   for (int i = 0; i < 16*1024; i++)
@@ -128,13 +150,15 @@ int main(int argc, char **argv)
       dest[i] = src[i];
     }
 
-  int test_id = get_arg(argc, argv, 1, 0);
-  assert(test_id >= 0 && test_id <= NUM_ELEMS(tests));
-
+  /* Number of bytes per call */
   int count = 31;
+  /* Number of times to run */
   int loops = 10000000;
+  /* True to flush the cache each time */
   int flush = 0;
+  /* Name of the test */
   const char *name = NULL;
+
   int opt;
 
   while ((opt = getopt(argc, argv, "c:l:ft:hv")) > 0)
@@ -162,35 +186,24 @@ int main(int argc, char **argv)
 	}
     }
 
-  const struct test *ptest = NULL;
-
-  if (name == NULL)
-    {
-      ptest = tests + 0;
-    }
-  else
-    {
-      for (const struct test *p = tests; p->name != NULL; p++)
-	{
-	  if (strcmp(p->name, name) == 0)
-	    {
-	      ptest = p;
-	      break;
-	    }
-	}
-    }
+  /* Find the test by name */
+  const struct test *ptest = find_test(name);
 
   if (ptest == NULL)
     {
       usage(argv[0]);
     }
 
-  stub_t stub = ptest->stub;
-
+  /* Make sure the buffers are null terminated for any string tests */
   src[count] = 0;
   dest[count] = 0;
 
-  double start = now();
+  struct timespec start, end;
+  int err = clock_gettime(CLOCK_MONOTONIC, &start);
+  assert(err == 0);
+
+  /* Preload */
+  stub_t stub = ptest->stub;
 
   for (int i = 0; i < loops; i++)
     {
@@ -202,10 +215,24 @@ int main(int argc, char **argv)
 	}
     }
 
-  double end = now();
-  double elapsed = end - start;
+  err = clock_gettime(CLOCK_MONOTONIC, &end);
+  assert(err == 0);
 
-  printf("%s: %s: %.3f for %u loops of %u bytes.  %.3f MB/s\n", variant + 1, ptest->name, elapsed, loops, count, (double)loops*count/elapsed/(1024*1024));
+  /* Pull the variant name out of the executable */
+  char *variant = strrchr(argv[0], '-');
+
+  if (variant == NULL)
+    {
+      variant = argv[0];
+    }
+
+  double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
+
+  /* Dump both machine and human readable versions */
+  printf("%s:%s:%u:%u:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s\n", 
+         variant + 1, ptest->name, count, loops, elapsed,
+         elapsed, loops, ptest->name, count,
+         (double)loops*count/elapsed/(1024*1024));
 
   return 0;
 }
