@@ -13,3 +13,9 @@ ltmain.sh
 missing
 obj
 test-*
+.libs
+.deps
+.dirstamp
+*.lo
+*.la
+config.*
