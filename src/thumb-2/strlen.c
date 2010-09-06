@@ -29,6 +29,13 @@
 #include <limits.h>
 #include <stddef.h>
 
+/* For GLIBC:
+#include <string.h>
+#include <memcopy.h>
+
+#undef strcmp
+*/
+
 #if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
   (defined (__thumb__) && !defined (__thumb2__))
 
@@ -176,3 +183,4 @@ strlen (const char* str)
        "BX LR");
 }
 #endif
+/* For GLIBC: libc_hidden_builtin_def (strlen) */

@@ -1,0 +1,13 @@
+= Random notes =
+As at eglibc_2.12.1-0ubuntu1, a good configure line for eglibc is:
+
+CC="gcc-4.4 -fno-stack-protector -U_FORTIFY_SOURCE" \
+            CXX="g++-4.4 -fno-stack-protector -U_FORTIFY_SOURCE" \
+            AUTOCONF=false \
+            configure --host=arm-linux-gnueabi --build=arm-linux-gnueabi \
+            --prefix=$HOME/opt --without-cvs \
+            --enable-add-ons=libidn,ports,nptl,cortexcpu \
+            --enable-profile --without-selinux --enable-stackguard-randomization \
+            --with-cpu=cortex-a8
+
+

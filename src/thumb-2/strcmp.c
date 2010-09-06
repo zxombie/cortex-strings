@@ -26,6 +26,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* For GLIBC:
+#include <string.h>
+#include <memcopy.h>
+
+#undef strcmp
+*/
+
 #ifdef __ARMEB__
 #define SHFT2LSB "lsl"
 #define SHFT2MSB "lsr"
@@ -439,3 +446,5 @@ strcmp_unaligned(const char* s1, const char* s2)
 }
 
 #endif
+
+/* For GLIBC: libc_hidden_builtin_def (strcmp) */

@@ -26,6 +26,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* For GLIBC:
+#include <string.h>
+#include <memcopy.h>
+
+#undef strcmp
+*/
+
 #ifdef __thumb2__
 #define magic1(REG) "#0x01010101"
 #define magic2(REG) "#0x80808080"
@@ -163,3 +170,4 @@ strcpy (char* dst, const char* src)
 #endif
        );
 }
+/* For GLIBC: libc_hidden_builtin_def (strcpy) */

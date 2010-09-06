@@ -26,6 +26,8 @@
  * SUCH DAMAGE.
  */
 
+/* For GLIBC: #include <sysdep.h> */
+
         .text
         .fpu    neon
 
@@ -140,3 +142,5 @@ memcpy:
         ldmfd       sp!, {r0, lr}
         bx          lr
         .fnend
+
+/* For GLIBC: libc_hidden_builtin_def (memcpy) */

@@ -42,6 +42,4 @@ The routines are currently under the modified BSD and simplified BSD.
 This is an early release that contains Cortex-A8 with NEON focused
 routines.  Most of the implementations have been collected from other
 projects and have a variety of licenses and copyright holders.  Future
-releases are intended to tidy this up.
-
-The GLIBC add-on generates a cortex-a8 add-on only.
+releases will tidy this up.

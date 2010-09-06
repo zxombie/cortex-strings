@@ -120,3 +120,18 @@ dhry_native_CFLAGS = $(dhry_CFLAGS)
 
 AM_CFLAGS = -std=gnu99 -mfpu=neon -Wall
 AM_CPPFLAGS = -mfpu=neon
+
+add_on_dist = add-on-dist
+add_on_dest = $(add_on_dist)/$(PACKAGE)/sysdeps/arm/eabi/arm/$(submachine)
+add_on_dirs = thumb-2 $(submachine) $(if $(filter yes,$(with_neon)),neon)
+add_on_src = \
+	$(wildcard $(add_on_dirs:%=$(srcdir)/src/%/*.c)) \
+	$(wildcard $(add_on_dirs:%=$(srcdir)/src/%/*.S)) \
+	$(wildcard $(add_on_dirs:%=$(srcdir)/src/%/*.h))
+
+add-on:
+	rm -rf $(add_on_dist)
+	mkdir -p $(add_on_dest)
+	cp -f $(add_on_src) $(add_on_dest)
+	python $(srcdir)/scripts/fixup.py GLIBC $(add_on_dest)/*
+	tar cf $(PACKAGE).tar -C $(add_on_dist) .

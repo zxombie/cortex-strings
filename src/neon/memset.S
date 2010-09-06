@@ -26,6 +26,8 @@
  * SUCH DAMAGE.
  */
 
+/* For GLIBC: #include <sysdep.h> */
+
         .text
 @	.syntax unified
 @	.thumb
@@ -117,3 +119,5 @@ memset:
         ldmfd       sp!, {r0}
         bx          lr
         .fnend
+
+/* For GLIBC: libc_hidden_builtin_def (memset) */
