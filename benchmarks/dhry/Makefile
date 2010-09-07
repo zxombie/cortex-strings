@@ -2,7 +2,7 @@
 #
 
 CC = gcc
-OPT = -O3
+OPT = -O3 -g
 CFLAGS += $(OPT)
 REF = ../../src/reference
 

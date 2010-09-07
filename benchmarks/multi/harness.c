@@ -19,6 +19,9 @@
 #define VERSION "(unknown version)"
 #endif
 
+/** Make sure a function is called by using the return value */
+#define SPOIL(_x)  volatile int x = (int)(_x); (void)x
+
 /** Type of functions that can be tested */
 typedef void (*stub_t)(void *dest, void *src, size_t n);
 
@@ -48,56 +51,57 @@ static void empty(volatile char *against)
 /** Stub that does nothing.  Used for calibrating */
 static void xbounce(void *dest, void *src, size_t n)
 {
+  SPOIL(0);
 }
 
 /** Stub that calls memcpy */
 static void xmemcpy(void *dest, void *src, size_t n)
 {
-  memcpy(dest, src, n);
+  SPOIL(memcpy(dest, src, n));
 }
 
 /** Stub that calls memset */
 static void xmemset(void *dest, void *src, size_t n)
 {
-  memset(dest, 0, n);
+  SPOIL(memset(dest, 0, n));
 }
 
 /** Stub that calls strcpy */
 static void xstrcpy(void *dest, void *src, size_t n)
 {
-  strcpy(dest, src);
+  SPOIL(strcpy(dest, src));
 }
 
 /** Stub that calls strlen */
 static void xstrlen(void *dest, void *src, size_t n)
 {
-  (void)strlen(dest);
+  SPOIL(strlen(dest));
 }
 
 /** Stub that calls strcmp */
 static void xstrcmp(void *dest, void *src, size_t n)
 {
-  (void)strcmp(dest, src);
+  SPOIL(strcmp(dest, src));
 }
 
 /** All functions that can be tested */
 static const struct test tests[] =
-{
-  { "memcpy", xmemcpy },
-  { "memset", xmemset },
-  { "strcpy", xstrcpy },
-  { "strlen", xstrlen },
-  { "strcmp", xstrcmp },
-  { "bounce", xbounce },
-  { NULL }
-};
+  {
+    { "memcpy", xmemcpy },
+    { "memset", xmemset },
+    { "strcpy", xstrcpy },
+    { "strlen", xstrlen },
+    { "strcmp", xstrcmp },
+    { "bounce", xbounce },
+    { NULL }
+  };
 
 /** Show basic usage */
 static void usage(const char* name)
 {
   printf("%s %s: run a string related benchmark.\n"
-	 "usage: %s [-c block-size] [-l loop-count] [-f] [-t test-name]\n"
-	 , name, VERSION, name);
+         "usage: %s [-c block-size] [-l loop-count] [-f] [-t test-name]\n"
+         , name, VERSION, name);
 
   printf("Tests:");
 
@@ -122,9 +126,9 @@ static const struct test *find_test(const char *name)
     {
       for (const struct test *p = tests; p->name != NULL; p++)
 	{
-	  if (strcmp(p->name, name) == 0)
+          if (strcmp(p->name, name) == 0)
 	    {
-	      return p;
+              return p;
 	    }
 	}
     }
@@ -166,23 +170,23 @@ int main(int argc, char **argv)
       switch (opt)
 	{
 	case 'c':
-	  count = atoi(optarg);
-	  break;
+          count = atoi(optarg);
+          break;
 	case 'l':
-	  loops = atoi(optarg);
-	  break;
+          loops = atoi(optarg);
+          break;
 	case 'f':
-	  flush = 1;
-	  break;
+          flush = 1;
+          break;
 	case 't':
-	  name = strdup(optarg);
-	  break;
+          name = strdup(optarg);
+          break;
 	case 'h':
-	  usage(argv[0]);
-	  break;
+          usage(argv[0]);
+          break;
 	default:
-	  usage(argv[0]);
-	  break;
+          usage(argv[0]);
+          break;
 	}
     }
 
@@ -211,7 +215,7 @@ int main(int argc, char **argv)
 
       if (flush != 0)
 	{
-	  empty(dest);
+          empty(dest);
 	}
     }
 
