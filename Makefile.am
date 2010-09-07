@@ -19,6 +19,8 @@ check_PROGRAMS = \
 noinst_PROGRAMS = \
 	dhry \
 	dhry-native \
+	try-none \
+	try-all \
 	try-bionic \
 	try-csl \
 	try-glibc \
@@ -88,9 +90,15 @@ libplain_a_SOURCES = \
 libmulti_a_SOURCES = \
 	benchmarks/multi/harness.c
 
-libmulti_a_CFLAGS = -DVERSION=$(VERSION) $(AM_CFLAGS)
+libmulti_a_CFLAGS = -DVERSION=\"$(VERSION)\" $(AM_CFLAGS)
 
 # Flags for the benchmark helpers
+try_none_SOURCES =
+try_none_LDFLAGS = -lrt
+try_none_LDADD = libmulti.a
+try_all_SOURCES =
+try_all_LDFLAGS = -lrt
+try_all_LDADD = libmulti.a libcortexcpu.la
 try_bionic_SOURCES =
 try_bionic_LDFLAGS = -lrt
 try_bionic_LDADD = libmulti.a libbionic.a
@@ -118,8 +126,8 @@ dhry_LDADD = libcortexcpu.la
 dhry_native_SOURCES = $(dhry_SOURCES)
 dhry_native_CFLAGS = $(dhry_CFLAGS)
 
-AM_CFLAGS = -std=gnu99 -mfpu=neon -Wall
-AM_CPPFLAGS = -mfpu=neon
+AM_CPPFLAGS = $(if $(filter yes,$(with_neon)),-mfpu=neon)
+AM_CFLAGS = -std=gnu99 -Wall $(AM_CPPFLAGS)
 
 add_on_dist = add-on-dist
 add_on_dest = $(add_on_dist)/$(PACKAGE)/sysdeps/arm/eabi/arm/$(submachine)
