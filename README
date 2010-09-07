@@ -10,13 +10,13 @@ unit.
 These routines can be used either stand-alone or as a GLIBC add-on.
 
 To use them stand-alone, first configure and then install
-libcortexcpu.so.  To make other applications use this library, either
-add -lcortexcpu to the link command or use LD_PRELOAD to load the
+libcortex-strings.so.  To make other applications use this library, either
+add -lcortex-strings to the link command or use LD_PRELOAD to load the
 library into existing applications.
 
 To use them as a GLIBC add-on, first configure and run `make add-on`
-to generate cortexcpu.tar.  Extract this into the GLIBC source
-directory, enable the add-on using `--enable-add-ons=cortexcpu` and
+to generate cortex-strings.tar.  Extract this into the GLIBC source
+directory, enable the add-on using `--enable-add-ons=cortex-strings` and
 `--with-cpu=cortex-a8`, build GLIBC, and install.
 
 == Contents ==

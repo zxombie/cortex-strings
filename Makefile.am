@@ -1,11 +1,11 @@
-# Top level Makefile for cortexcpu
+# Top level Makefile for cortex-strings
 
 # Used to record the compiler version in the executables
 COMPILER = $(shell $(CC) --version 2>&1 | head -n1)
 
 # The main library
 lib_LTLIBRARIES = \
-	libcortexcpu.la
+	libcortex-strings.la
 
 # Test suite
 check_PROGRAMS = \
@@ -37,7 +37,7 @@ noinst_LIBRARIES = \
 	libmulti.a
 
 # Main library
-libcortexcpu_la_SOURCES = \
+libcortex_strings_la_SOURCES = \
 	src/neon/memcpy.S \
 	src/neon/memset.S \
 	src/thumb-2/strcmp.c \
@@ -45,15 +45,15 @@ libcortexcpu_la_SOURCES = \
 	src/thumb-2/strlen.c
 
 # Options for the tests
-tests_test_memcpy_LDADD = libcortexcpu.la
+tests_test_memcpy_LDADD = libcortex-strings.la
 tests_test_memcpy_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_memset_LDADD = libcortexcpu.la
+tests_test_memset_LDADD = libcortex-strings.la
 tests_test_memset_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strcmp_LDADD = libcortexcpu.la
+tests_test_strcmp_LDADD = libcortex-strings.la
 tests_test_strcmp_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strcpy_LDADD = libcortexcpu.la
+tests_test_strcpy_LDADD = libcortex-strings.la
 tests_test_strcpy_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strlen_LDADD = libcortexcpu.la
+tests_test_strlen_LDADD = libcortex-strings.la
 tests_test_strlen_CFLAGS = -Itests $(AM_CFLAGS)
 
 TESTS = $(check_PROGRAMS)
@@ -98,7 +98,7 @@ try_none_LDFLAGS = -lrt
 try_none_LDADD = libmulti.a
 try_all_SOURCES =
 try_all_LDFLAGS = -lrt
-try_all_LDADD = libmulti.a libcortexcpu.la
+try_all_LDADD = libmulti.a libcortex-strings.la
 try_bionic_SOURCES =
 try_bionic_LDFLAGS = -lrt
 try_bionic_LDADD = libmulti.a libbionic.a
@@ -121,7 +121,7 @@ dhry_SOURCES = \
 	benchmarks/dhry/dhry_2.c
 
 dhry_CFLAGS = -Dcompiler="\"$(COMPILER)\"" -Doptions="\"$(CFLAGS)\""
-dhry_LDADD = libcortexcpu.la
+dhry_LDADD = libcortex-strings.la
 
 dhry_native_SOURCES = $(dhry_SOURCES)
 dhry_native_CFLAGS = $(dhry_CFLAGS)

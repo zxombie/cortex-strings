@@ -6,7 +6,7 @@ CC="gcc-4.4 -fno-stack-protector -U_FORTIFY_SOURCE" \
             AUTOCONF=false \
             configure --host=arm-linux-gnueabi --build=arm-linux-gnueabi \
             --prefix=$HOME/opt --without-cvs \
-            --enable-add-ons=libidn,ports,nptl,cortexcpu \
+            --enable-add-ons=libidn,ports,nptl,cortex-strings \
             --enable-profile --without-selinux --enable-stackguard-randomization \
             --with-cpu=cortex-a8
 
