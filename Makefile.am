@@ -45,16 +45,18 @@ libcortex_strings_la_SOURCES = \
 	src/thumb-2/strlen.c
 
 # Options for the tests
-tests_test_memcpy_LDADD = libcortex-strings.la
-tests_test_memcpy_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_memset_LDADD = libcortex-strings.la
-tests_test_memset_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strcmp_LDADD = libcortex-strings.la
-tests_test_strcmp_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strcpy_LDADD = libcortex-strings.la
-tests_test_strcpy_CFLAGS = -Itests $(AM_CFLAGS)
-tests_test_strlen_LDADD = libcortex-strings.la
-tests_test_strlen_CFLAGS = -Itests $(AM_CFLAGS)
+tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
+tests_ldadd = libcortex-strings.la
+tests_test_memcpy_LDADD = $(tests_ldadd)
+tests_test_memcpy_CFLAGS = $(tests_cflags)
+tests_test_memset_LDADD = $(tests_ldadd)
+tests_test_memset_CFLAGS = $(tests_cflags)
+tests_test_strcmp_LDADD = $(tests_ldadd)
+tests_test_strcmp_CFLAGS = $(tests_cflags)
+tests_test_strcpy_LDADD = $(tests_ldadd)
+tests_test_strcpy_CFLAGS = $(tests_cflags)
+tests_test_strlen_LDADD = $(tests_ldadd)
+tests_test_strlen_CFLAGS = $(tests_cflags)
 
 TESTS = $(check_PROGRAMS)
 
@@ -68,7 +70,8 @@ libbionic_a_SOURCES = \
 
 libcsl_a_SOURCES = \
 	reference/csl/memcpy.c \
-	reference/csl/memset.c
+	reference/csl/memset.c \
+	reference/csl/arm_asm.h
 
 libglibc_a_SOURCES = \
 	reference/glibc/memmove.S \
@@ -79,7 +82,8 @@ libglibc_a_SOURCES = \
 libnewlib_a_SOURCES = \
 	reference/newlib/strcmp.c \
 	reference/newlib/strlen.c \
-	reference/newlib/strcpy.c
+	reference/newlib/strcpy.c \
+	reference/newlib/arm_asm.h
 
 libplain_a_SOURCES = \
 	reference/plain/memset.c \
@@ -118,7 +122,8 @@ try_plain_LDADD = libmulti.a libplain.a
 # Good 'ol Dhrystone
 dhry_SOURCES = \
 	benchmarks/dhry/dhry_1.c \
-	benchmarks/dhry/dhry_2.c
+	benchmarks/dhry/dhry_2.c \
+	benchmarks/dhry/dhry.h
 
 dhry_CFLAGS = -Dcompiler="\"$(COMPILER)\"" -Doptions="\"$(CFLAGS)\""
 dhry_LDADD = libcortex-strings.la
@@ -128,6 +133,11 @@ dhry_native_CFLAGS = $(dhry_CFLAGS)
 
 AM_CPPFLAGS = $(if $(filter yes,$(with_neon)),-mfpu=neon)
 AM_CFLAGS = -std=gnu99 -Wall $(AM_CPPFLAGS)
+
+EXTRA_DIST = \
+	tests/hp-timing.h \
+	tests/test-string.h \
+	tests/test-skeleton.c
 
 add_on_dist = add-on-dist
 add_on_dest = $(add_on_dist)/$(PACKAGE)/sysdeps/arm/eabi/arm/$(submachine)
