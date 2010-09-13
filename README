@@ -35,6 +35,10 @@ implementation they run on and optional features used.  For example:
 
 == History ==
 
+See:
+ https://blueprints.launchpad.net/linaro/+spec/armv7-string-tuning
+for future work.
+
 == Licensing ==
 The routines are currently under the modified BSD and simplified BSD.
 
