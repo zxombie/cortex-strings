@@ -19,3 +19,7 @@ test-*
 *.lo
 *.la
 config.*
+try-*
+/dhry
+dhry-native
+*.tar.gz

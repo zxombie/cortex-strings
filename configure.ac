@@ -1,4 +1,4 @@
-AC_INIT(cortex-strings, 0.1)
+AC_INIT(cortex-strings, 0.1.1)
 AM_INIT_AUTOMAKE(foreign subdir-objects color-tests)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile)
@@ -25,5 +25,6 @@ AC_ARG_WITH([neon],
 	    [with_neon=$withval],
 	    [with_neon=yes])
 AC_SUBST(with_neon)
+AM_CONDITIONAL(WITH_NEON, test x$with_neon = xyes)
 
 AC_OUTPUT
