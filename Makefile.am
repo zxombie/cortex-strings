@@ -52,7 +52,9 @@ libcortex_strings_la_SOURCES = \
 	$(neon_sources) \
 	src/thumb-2/strcmp.c \
 	src/thumb-2/strcpy.c \
-	src/thumb-2/strlen.c
+	src/linaro-a9/memchr.s \
+	src/linaro-a9/strchr.s \
+	src/linaro-a9/strlen.s
 
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
