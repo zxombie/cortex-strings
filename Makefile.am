@@ -80,6 +80,8 @@ libbionic_a_SOURCES = \
 	reference/bionic/memset.S \
 	reference/bionic/memcmp.S
 
+libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
+
 libcsl_a_SOURCES = \
 	reference/csl/memcpy.c \
 	reference/csl/memset.c \
@@ -110,26 +112,19 @@ libmulti_a_CFLAGS = -DVERSION=\"$(VERSION)\" $(AM_CFLAGS)
 
 # Flags for the benchmark helpers
 try_none_SOURCES =
-try_none_LDFLAGS = -lrt
-try_none_LDADD = libmulti.a
+try_none_LDADD = libmulti.a -lrt
 try_all_SOURCES =
-try_all_LDFLAGS = -lrt
-try_all_LDADD = libmulti.a libcortex-strings.la
+try_all_LDADD = libmulti.a libcortex-strings.la -lrt
 try_bionic_SOURCES =
-try_bionic_LDFLAGS = -lrt
-try_bionic_LDADD = libmulti.a libbionic.a
+try_bionic_LDADD = libmulti.a libbionic.a -lrt
 try_csl_SOURCES =
-try_csl_LDFLAGS = -lrt
-try_csl_LDADD = libmulti.a libcsl.a
+try_csl_LDADD = libmulti.a libcsl.a -lrt
 try_glibc_SOURCES =
-try_glibc_LDFLAGS = -lrt
-try_glibc_LDADD = libmulti.a libglibc.a
+try_glibc_LDADD = libmulti.a libglibc.a -lrt
 try_newlib_SOURCES =
-try_newlib_LDFLAGS = -lrt
-try_newlib_LDADD = libmulti.a libnewlib.a
+try_newlib_LDADD = libmulti.a libnewlib.a -lrt
 try_plain_SOURCES =
-try_plain_LDFLAGS = -lrt
-try_plain_LDADD = libmulti.a libplain.a
+try_plain_LDADD = libmulti.a libplain.a -lrt
 
 # Good 'ol Dhrystone
 dhry_SOURCES = \
