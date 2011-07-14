@@ -21,7 +21,15 @@
 
 @ 2011-02-07 david.gilbert@linaro.org
 @    Extracted from local git a5b438d861
+@ 2011-07-14 david.gilbert@linaro.org
+@    Import endianness fix from local git ea786f1b
 
+@ this lets us check a flag in a 00/ff byte easily in either endianness
+#ifdef __ARMEB__
+#define CHARTSTMASK(c) 1<<(31-(c*8))
+#else
+#define CHARTSTMASK(c) 1<<(c*8)
+#endif
         .text
         .thumb
 
@@ -107,10 +115,10 @@ memchr:
   subne r0,r0,#7      @ or 2nd byte of 1st word
 
   @ r0 currently points to the 3rd byte of the word containing the hit
-  tst   r5, # (1<<0)  @ 1st character
+  tst   r5, # CHARTSTMASK(0)  @ 1st character
   bne   61f
   adds  r0,r0,#1
-  tst   r5, # (1<<8)  @ 2nd character
+  tst   r5, # CHARTSTMASK(1)  @ 2nd character
   ittt  eq
   addeq r0,r0,#1
   tsteq r5, # (3<<15) @ 2nd & 3rd character
