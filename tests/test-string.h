@@ -42,6 +42,7 @@ extern impl_t __start_impls[], __stop_impls[];
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -50,7 +51,7 @@ extern impl_t __start_impls[], __stop_impls[];
 #include <time.h>
 #define GL(x) _##x
 #define GLRO(x) _##x
-#include <hp-timing.h>
+#include "hp-timing.h"
 
 
 # define TEST_FUNCTION test_main ()

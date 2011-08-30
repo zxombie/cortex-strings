@@ -20,8 +20,10 @@ lib_LTLIBRARIES = \
 
 # Test suite
 check_PROGRAMS = \
+	tests/test-memchr \
 	tests/test-memcpy \
 	tests/test-memset \
+	tests/test-strchr \
 	tests/test-strcmp \
 	tests/test-strcpy \
 	tests/test-strlen
