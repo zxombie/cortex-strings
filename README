@@ -17,7 +17,7 @@ library into existing applications.
 To use them as a GLIBC add-on, first configure and run `make add-on`
 to generate cortex-strings.tar.  Extract this into the GLIBC source
 directory, enable the add-on using `--enable-add-ons=cortex-strings` and
-`--with-cpu=cortex-a8`, build GLIBC, and install.
+`--with-cpu=cortex-a9`, build GLIBC, and install.
 
 == Contents ==
  * src/  contains the routines themselves
@@ -30,8 +30,7 @@ directory, enable the add-on using `--enable-add-ons=cortex-strings` and
 The src directory contains different variants organised by the
 implementation they run on and optional features used.  For example:
   * src/thumb-2  contains generic non-NEON routines for all processors
-  * src/neon for  contains NEON based routines for all processors
-  * src/cortex-a8/neon  for NEON-based routines especially optimised for the A8
+  * src/neon  contains NEON based routines for all processors
 
 == History ==
 

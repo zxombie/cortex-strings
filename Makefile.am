@@ -141,7 +141,7 @@ dhry_native_SOURCES = $(dhry_SOURCES)
 dhry_native_CFLAGS = $(dhry_CFLAGS)
 
 AM_CPPFLAGS = $(neon_cppflags)
-AM_CFLAGS = -std=gnu99 -Wall $(AM_CPPFLAGS)
+AM_CFLAGS = -std=gnu99 -Wall -mtune=$(submachine) $(AM_CPPFLAGS)
 
 EXTRA_DIST = \
 	tests/hp-timing.h \

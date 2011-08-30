@@ -1,4 +1,4 @@
-AC_INIT(cortex-strings, 0.1.1)
+AC_INIT(cortex-strings, 0.2~bzr)
 AM_INIT_AUTOMAKE(foreign subdir-objects color-tests)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile)
@@ -7,7 +7,7 @@ AM_PROG_AS
 
 AC_ARG_WITH([cpu],
 	    AS_HELP_STRING([--with-cpu=CPU],
-                           [select code for CPU variant @<:@default=cortex-a8@:>@]]),
+                           [select code for CPU variant @<:@default=cortex-a9@:>@]]),
 	    [dnl
   case "$withval" in
   yes|'') AC_MSG_ERROR([--with-cpu requires an argument]) ;;
@@ -15,7 +15,7 @@ AC_ARG_WITH([cpu],
   *) submachine="$withval" ;;
   esac
 ],
-[submachine=cortex-a8])
+[submachine=cortex-a9])
 
 AC_SUBST(submachine)
 
