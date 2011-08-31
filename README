@@ -32,6 +32,16 @@ implementation they run on and optional features used.  For example:
   * src/thumb-2  contains generic non-NEON routines for all processors
   * src/neon  contains NEON based routines for all processors
 
+== Reference versions ==
+reference/ contains versions collected from various popular Open
+Source libraries.  These have been modified for use in benchmarking.
+Please refer to the individual files for any licensing terms.
+
+The routines were collected from the following releases:
+ * EGLIBC 2.13
+ * Newlib 1.19.0
+ * Bionic android-2.3.5_r1
+
 == History ==
 
 See:

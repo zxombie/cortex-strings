@@ -6,8 +6,7 @@ COMPILER = $(shell $(CC) --version 2>&1 | head -n1)
 if WITH_NEON
 # Pull in the NEON specific files
 neon_sources = \
-	src/neon/memcpy.S \
-	src/neon/memset.S
+	src/neon/memcpy.S
 neon_bionic_sources = \
 	reference/bionic/memcpy.S
 neon_cppflags = -mfpu=neon
@@ -38,6 +37,7 @@ noinst_PROGRAMS = \
 	try-csl \
 	try-glibc \
 	try-newlib \
+	try-newlib-xscale \
 	try-plain
 
 # Libraries used in the benchmarks and examples
@@ -46,6 +46,7 @@ noinst_LIBRARIES = \
 	libcsl.a \
 	libglibc.a \
 	libnewlib.a \
+	libnewlib-xscale.a \
 	libplain.a \
 	libmulti.a
 
@@ -56,7 +57,8 @@ libcortex_strings_la_SOURCES = \
 	src/thumb-2/strcpy.c \
 	src/linaro-a9/memchr.s \
 	src/linaro-a9/strchr.s \
-	src/linaro-a9/strlen.s
+	src/linaro-a9/strlen.s \
+	src/linaro-a9/memset.S
 
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
@@ -77,10 +79,12 @@ TESTS = $(check_PROGRAMS)
 # Libraries containing the difference reference versions
 libbionic_a_SOURCES = \
 	$(neon_bionic_sources) \
-	reference/bionic/memcmp16.S \
-	reference/bionic/strlen.c \
+	reference/bionic/memchr.c \
 	reference/bionic/memset.S \
-	reference/bionic/memcmp.S
+	reference/bionic/strchr.c \
+	reference/bionic/strcmp.c \
+	reference/bionic/strcpy.c \
+	reference/bionic/strlen.c
 
 libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
 
@@ -90,18 +94,32 @@ libcsl_a_SOURCES = \
 	reference/csl/arm_asm.h
 
 libglibc_a_SOURCES = \
-	reference/glibc/memmove.S \
-	reference/glibc/memset.S \
-	reference/glibc/strlen.S \
-	reference/glibc/memcpy.S \
 	reference/glibc/memchr.c \
-	reference/glibc/strchr.c
+	reference/glibc/memcpy.S \
+	reference/glibc/memset.S \
+	reference/glibc/strchr.c \
+	reference/glibc/strcmp.c \
+	reference/glibc/strcpy.c \
+	reference/glibc/strlen.S
 
 libnewlib_a_SOURCES = \
+	reference/newlib/memchr.c \
+	reference/newlib/memcpy.c \
+	reference/newlib/memset.c \
+	reference/newlib/strchr.c \
 	reference/newlib/strcmp.c \
-	reference/newlib/strlen.c \
 	reference/newlib/strcpy.c \
+	reference/newlib/strlen.c \
 	reference/newlib/arm_asm.h
+
+libnewlib_xscale_a_SOURCES = \
+	reference/newlib-xscale/memchr.c \
+	reference/newlib-xscale/memcpy.c \
+	reference/newlib-xscale/memset.c \
+	reference/newlib-xscale/strchr.c \
+	reference/newlib-xscale/strcmp.c \
+	reference/newlib-xscale/strcpy.c \
+	reference/newlib-xscale/strlen.c
 
 libplain_a_SOURCES = \
 	reference/plain/memset.c \
@@ -127,6 +145,8 @@ try_glibc_SOURCES =
 try_glibc_LDADD = libmulti.a libglibc.a -lrt
 try_newlib_SOURCES =
 try_newlib_LDADD = libmulti.a libnewlib.a -lrt
+try_newlib_xscale_SOURCES =
+try_newlib_xscale_LDADD = libmulti.a libnewlib-xscale.a -lrt
 try_plain_SOURCES =
 try_plain_LDADD = libmulti.a libplain.a -lrt
 
