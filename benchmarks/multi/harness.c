@@ -119,7 +119,7 @@ static const struct test tests[] =
 static void usage(const char* name)
 {
   printf("%s %s: run a string related benchmark.\n"
-         "usage: %s [-c block-size] [-l loop-count] [-f] [-t test-name]\n"
+         "usage: %s [-c block-size] [-l loop-count] [-a alignment] [-f] [-t test-name]\n"
          , name, VERSION, name);
 
   printf("Tests:");
@@ -155,6 +155,21 @@ static const struct test *find_test(const char *name)
   return NULL;
 }
 
+/** Take a pointer and ensure that the lower bits == alignment */
+static char *realign(char *p, int alignment)
+{
+  if (alignment < 0)
+    {
+      return p;
+    }
+
+  uintptr_t pp = (uintptr_t)p;
+  pp = (pp + 255) & ~255;
+  pp += alignment;
+
+  return (char *)pp;
+}
+
 /** Setup and run a test */
 int main(int argc, char **argv)
 {
@@ -164,15 +179,6 @@ int main(int argc, char **argv)
 
   assert(src != NULL && dest != NULL);
 
-  /* Fill the first 16 k with non-zero, reproducable random data */
-  srandom(1539);
-
-  for (int i = 0; i < 16*1024; i++)
-    {
-      src[i] = (char)random() | 1;
-      dest[i] = src[i];
-    }
-
   /* Number of bytes per call */
   int count = 31;
   /* Number of times to run */
@@ -181,10 +187,12 @@ int main(int argc, char **argv)
   int flush = 0;
   /* Name of the test */
   const char *name = NULL;
+  /* Alignment of both buffers */
+  int alignment = -1;
 
   int opt;
 
-  while ((opt = getopt(argc, argv, "c:l:ft:hv")) > 0)
+  while ((opt = getopt(argc, argv, "c:l:ft:hva:")) > 0)
     {
       switch (opt)
 	{
@@ -193,6 +201,9 @@ int main(int argc, char **argv)
           break;
 	case 'l':
           loops = atoi(optarg);
+          break;
+	case 'a':
+          alignment = atoi(optarg);
           break;
 	case 'f':
           flush = 1;
@@ -217,6 +228,18 @@ int main(int argc, char **argv)
       usage(argv[0]);
     }
 
+  src = realign(src, alignment);
+  dest = realign(dest, alignment);
+
+  /* Fill the first 16 k with non-zero, reproducable random data */
+  srandom(1539);
+
+  for (int i = 0; i < 16*1024; i++)
+    {
+      src[i] = (char)random() | 1;
+      dest[i] = src[i];
+    }
+
   /* Make sure the buffers are null terminated for any string tests */
   src[count] = 0;
   dest[count] = 0;
@@ -228,13 +251,20 @@ int main(int argc, char **argv)
   /* Preload */
   stub_t stub = ptest->stub;
 
-  for (int i = 0; i < loops; i++)
+  /* Run two variants to reduce the cost of testing for the flush */
+  if (flush == 0)
     {
-      (*stub)(dest, src, count);
-
-      if (flush != 0)
+      for (int i = 0; i < loops; i++)
 	{
-          empty(dest);
+	  (*stub)(dest, src, count);
+	}
+    }
+  else
+    {
+      for (int i = 0; i < loops; i++)
+	{
+	  (*stub)(dest, src, count);
+	  empty(dest);
 	}
     }
 
@@ -250,12 +280,16 @@ int main(int argc, char **argv)
     }
 
   double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
+  /* Estimate the bounce time.  Measured on a Panda. */
+  double bounced = 0.448730 * loops / 50000000;
 
   /* Dump both machine and human readable versions */
-  printf("%s:%s:%u:%u:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s\n", 
-         variant + 1, ptest->name, count, loops, elapsed,
+  printf("%s:%s:%u:%u:%d:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s corrected.\n", 
+         variant + 1, ptest->name,
+	 count, loops, alignment,
+	 elapsed,
          elapsed, loops, ptest->name, count,
-         (double)loops*count/elapsed/(1024*1024));
+         (double)loops*count/(elapsed - bounced)/(1024*1024));
 
   return 0;
 }
