@@ -33,7 +33,7 @@ noinst_PROGRAMS = \
 	dhry \
 	dhry-native \
 	try-none \
-	try-all \
+	try-this \
 	try-bionic \
 	try-csl \
 	try-glibc \
@@ -93,7 +93,9 @@ libglibc_a_SOURCES = \
 	reference/glibc/memmove.S \
 	reference/glibc/memset.S \
 	reference/glibc/strlen.S \
-	reference/glibc/memcpy.S
+	reference/glibc/memcpy.S \
+	reference/glibc/memchr.c \
+	reference/glibc/strchr.c
 
 libnewlib_a_SOURCES = \
 	reference/newlib/strcmp.c \
@@ -115,8 +117,8 @@ libmulti_a_CFLAGS = -DVERSION=\"$(VERSION)\" $(AM_CFLAGS)
 # Flags for the benchmark helpers
 try_none_SOURCES =
 try_none_LDADD = libmulti.a -lrt
-try_all_SOURCES =
-try_all_LDADD = libmulti.a libcortex-strings.la -lrt
+try_this_SOURCES =
+try_this_LDADD = libmulti.a libcortex-strings.la -lrt
 try_bionic_SOURCES =
 try_bionic_LDADD = libmulti.a libbionic.a -lrt
 try_csl_SOURCES =
