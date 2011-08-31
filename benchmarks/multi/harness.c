@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <unistd.h>
+#include <assert.h>
 
 #define NUM_ELEMS(_x) (sizeof(_x) / sizeof((_x)[0]))
 
@@ -84,15 +85,33 @@ static void xstrcmp(void *dest, void *src, size_t n)
   SPOIL(strcmp(dest, src));
 }
 
+/** Stub that calls strchr */
+static void xstrchr(void *dest, void *src, size_t n)
+{
+  /* Put the character at the end of the string and before the null */
+  ((char *)src)[n-1] = 32;
+  SPOIL(strchr(src, 32));
+}
+
+/** Stub that calls memchr */
+static void xmemchr(void *dest, void *src, size_t n)
+{
+  /* Put the character at the end of the block */
+  ((char *)src)[n-1] = 32;
+  SPOIL(memchr(src, 32, n));
+}
+
 /** All functions that can be tested */
 static const struct test tests[] =
   {
+    { "bounce", xbounce },
+    { "memchr", xmemchr },
     { "memcpy", xmemcpy },
     { "memset", xmemset },
+    { "strchr", xstrchr },
+    { "strcmp", xstrcmp },
     { "strcpy", xstrcpy },
     { "strlen", xstrlen },
-    { "strcmp", xstrcmp },
-    { "bounce", xbounce },
     { NULL }
   };
 
@@ -203,7 +222,7 @@ int main(int argc, char **argv)
   dest[count] = 0;
 
   struct timespec start, end;
-  int err = clock_gettime(CLOCK_MONOTONIC, &start);
+  int err = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
   assert(err == 0);
 
   /* Preload */
@@ -219,7 +238,7 @@ int main(int argc, char **argv)
 	}
     }
 
-  err = clock_gettime(CLOCK_MONOTONIC, &end);
+  err = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
   assert(err == 0);
 
   /* Pull the variant name out of the executable */
