@@ -16,15 +16,19 @@ def run(cache, variant, function, bytes, loops):
         xbuild = build
         cmd = '%(xbuild)s%(variant)s -t %(function)s -c %(bytes)s -l %(loops)s' % locals()
 
-        got = subprocess.check_output(cmd.split()).strip()
-        cache[key] = got
-        print got
+        try:
+            got = subprocess.check_output(cmd.split()).strip()
+            cache[key] = got
+            print got
+        except OSError, ex:
+            assert False, 'Error %s while running %s' % (ex, cmd)
 
     sys.stdout.flush()
 
 
 def run_bytes(cache, variant, function, bytes):
     for b in bytes:
+        # Figure out the number of loops to give a roughly consistent run
         loops = int(500000000/5 / math.sqrt(b))
         run(cache, variant, function, b, loops)
 
@@ -35,8 +39,8 @@ def run_functions(cache, variant, functions, bytes):
 
 
 HAS = {
-    'this': 'strcmp strcpy memchr strchr strlen memcpy memset',
-    'bionc': 'strlen memset memcpy',
+    'this': 'bounce strcmp strcpy memchr strchr strlen memcpy memset',
+    'bionic': 'strlen memset memcpy',
     'glibc': 'memset strlen memcpy  strcmp strcpy memchr strchr',
     'newlib': 'strcmp strlen strcpy',
     'plain': 'memset memcpy strcmp strcpy',
@@ -56,7 +60,11 @@ def run_variants(cache, variants, bytes):
 
 def run_top(cache):
     variants = HAS.keys()
-    bytes = [2**x for x in range(1, 12)]
+    power2 = [2**x for x in range(1, 12)]
+    minus1 = [x-1 for x in power2]
+    various = [int(1.7*x) for x in range(1, 12)]
+
+    bytes = sorted(set(power2 + minus1 + various))
     run_variants(cache, variants, bytes)
 
 
@@ -81,4 +89,5 @@ def main():
             for line in cache.values():
                 print >> f, line
 
-main()
+if __name__ == '__main__':
+    main()

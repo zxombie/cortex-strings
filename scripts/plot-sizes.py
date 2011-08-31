@@ -16,6 +16,7 @@ def plot(records, function):
     bytes = libplot.unique(records, 'bytes')
 
     colours = iter('bgrcmyk')
+    all_x = []
 
     pylab.clf()
 
@@ -26,6 +27,7 @@ def plot(records, function):
         X = [x.bytes for x in matches]
         Y = [x.bytes*x.loops/x.elapsed/(1024*1024) for x in matches]
 
+        all_x.extend(X)
         colour = colours.next()
 
         if X:
@@ -38,7 +40,7 @@ def plot(records, function):
     pylab.xlabel('Size (B)')
     pylab.ylabel('Rate (MB/s)')
     pylab.semilogx()
-    pylab.xlim(0, max(X))
+    pylab.xlim(0, max(all_x))
     pylab.ylim(0, pylab.ylim()[1])
 
 def main():

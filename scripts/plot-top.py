@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-"""Plot the results of benchmarking different variants of the string
-routines for one size.
+"""Plot the performance of different variants of the string routines
+for one size.
 """
 
 import libplot
@@ -9,10 +9,7 @@ import libplot
 import pylab
 
 
-def main():
-    bytes = 64
-
-    records = libplot.parse()
+def plot(records, bytes):
     records = [x for x in records if x.bytes==bytes]
 
     variants = libplot.unique(records, 'variant')
@@ -31,7 +28,7 @@ def main():
 
             if matches:
                 match = matches[0]
-                heights.append(match.bytes*match.loops/match.elapsed)
+                heights.append(match.bytes*match.loops/match.elapsed/(1024*1024))
             else:
                 heights.append(0)
 
@@ -41,8 +38,15 @@ def main():
     axes.set_xticklabels(functions)
     axes.set_xticks(X + 0.5)
 
+    pylab.title('Performance of different variants for %d byte blocks' % bytes)
+    pylab.ylabel('Rate (MB/s)')
     pylab.legend()
     pylab.grid()
+    pylab.savefig('top-%d.png' % bytes)
+
+def main():
+    records = libplot.parse()
+    plot(records, 64)
     pylab.show()
 
 if __name__ == '__main__':
