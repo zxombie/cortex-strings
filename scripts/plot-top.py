@@ -12,13 +12,15 @@ import pylab
 def plot(records, bytes):
     records = [x for x in records if x.bytes==bytes]
 
-    variants = libplot.unique(records, 'variant')
+    variants = libplot.unique(records, 'variant', prefer='this')
     functions = libplot.unique(records, 'function')
 
     X = pylab.arange(len(functions))
     width = 1.0/(len(X)+1)
 
     colours = iter('bgrcmyk')
+
+    pylab.clf()
 
     for i, variant in enumerate(variants):
         heights = []
@@ -46,7 +48,10 @@ def plot(records, bytes):
 
 def main():
     records = libplot.parse()
-    plot(records, 64)
+
+    for bytes in [1, 8, 31, 64, 128]:
+        plot(records, bytes)
+
     pylab.show()
 
 if __name__ == '__main__':

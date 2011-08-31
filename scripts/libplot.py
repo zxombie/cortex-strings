@@ -3,21 +3,25 @@
 import fileinput
 import collections
 
-Record = collections.namedtuple('Record', 'variant function bytes loops elapsed rest')
+Record = collections.namedtuple('Record', 'variant function bytes loops alignment elapsed rest')
 
 
 def parse_value(v):
     """Turn text into a primitive"""
     try:
-        return float(v)
+        if '.' in v:
+            return float(v)
+        else:
+            return int(v)
     except ValueError:
         return v
 
 
-def unique(records, name):
+def unique(records, name, prefer=''):
     """Return the unique values of a column in the records"""
     values = set(getattr(x, name) for x in records)
-    return sorted(values)
+
+    return sorted(values, key=lambda x: '%d|%s' % (-prefer.find(x), x))
 
 
 def parse():

@@ -9,11 +9,18 @@ import libplot
 import pylab
 import pdb
 
-def plot(records, function):
+def plot(records, function, alignment=None):
     variants = libplot.unique(records, 'variant')
     records = [x for x in records if x.function==function]
 
-    bytes = libplot.unique(records, 'bytes')
+    if alignment != None:
+        records = [x for x in records if x.alignment==alignment]
+
+    alignments = libplot.unique(records, 'alignment')
+    assert len(alignments) == 1
+    aalignment = alignments[0]
+
+    bytes = libplot.unique(records, 'bytes')[0]
 
     colours = iter('bgrcmyk')
     all_x = []
@@ -36,7 +43,7 @@ def plot(records, function):
 
     pylab.legend(loc='upper left')
     pylab.grid()
-    pylab.title('%s in MB/s' % function)
+    pylab.title('%(function)s of %(aalignment)s byte aligned, %(bytes)s byte blocks' % locals())
     pylab.xlabel('Size (B)')
     pylab.ylabel('Rate (MB/s)')
     pylab.semilogx()
