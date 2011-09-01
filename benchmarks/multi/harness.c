@@ -271,13 +271,16 @@ int main(int argc, char **argv)
   err = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
   assert(err == 0);
 
-  /* Pull the variant name out of the executable */
-  char *variant = strrchr(argv[0], '-');
+  /* Drop any leading path and pull the variant name out of the executable */
+  char *variant = strrchr(argv[0], '/');
 
   if (variant == NULL)
     {
       variant = argv[0];
     }
+
+  variant = strstr(variant, "try-");
+  assert(variant != NULL);
 
   double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) * 1e-9;
   /* Estimate the bounce time.  Measured on a Panda. */
@@ -285,7 +288,7 @@ int main(int argc, char **argv)
 
   /* Dump both machine and human readable versions */
   printf("%s:%s:%u:%u:%d:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s corrected.\n", 
-         variant + 1, ptest->name,
+         variant + 4, ptest->name,
 	 count, loops, alignment,
 	 elapsed,
          elapsed, loops, ptest->name, count,
