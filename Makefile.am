@@ -110,7 +110,8 @@ libnewlib_a_SOURCES = \
 	reference/newlib/strcmp.c \
 	reference/newlib/strcpy.c \
 	reference/newlib/strlen.c \
-	reference/newlib/arm_asm.h
+	reference/newlib/arm_asm.h \
+	reference/newlib/shim.h
 
 libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/memchr.c \
@@ -119,7 +120,8 @@ libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/strchr.c \
 	reference/newlib-xscale/strcmp.c \
 	reference/newlib-xscale/strcpy.c \
-	reference/newlib-xscale/strlen.c
+	reference/newlib-xscale/strlen.c \
+	reference/newlib-xscale/xscale.h
 
 libplain_a_SOURCES = \
 	reference/plain/memset.c \
@@ -163,7 +165,9 @@ dhry_native_SOURCES = $(dhry_SOURCES)
 dhry_native_CFLAGS = $(dhry_CFLAGS)
 
 AM_CPPFLAGS = $(neon_cppflags)
-AM_CFLAGS = -std=gnu99 -Wall -mtune=$(submachine) $(AM_CPPFLAGS)
+AM_CFLAGS = -std=gnu99 -Wall \
+	-fno-builtin -fno-stack-protector -U_FORTIFY_SOURCE \
+	-mtune=$(submachine) $(AM_CPPFLAGS)
 
 EXTRA_DIST = \
 	tests/hp-timing.h \
