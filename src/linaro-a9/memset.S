@@ -62,6 +62,10 @@ memset:
   beq   5f
 
 3:
+  @ POSIX says that ch is cast to an unsigned char.  A uxtb is one
+  @ byte and takes two cycles, where an AND is four bytes but one
+  @ cycle...
+  and   r1, #0xFF
   orr   r1, r1, r1, lsl#8  @ Same character into all bytes
   orr   r1, r1, r1, lsl#16
   mov   r5,r1
