@@ -19,10 +19,16 @@ def parse_value(v):
 
 def unique(records, name, prefer=''):
     """Return the unique values of a column in the records"""
-    values = set(getattr(x, name) for x in records)
+    values = list(set(getattr(x, name) for x in records))
 
-    return sorted(values, key=lambda x: '%d|%s' % (-prefer.find(x), x))
-
+    if not values:
+        return values
+    elif type(values[0]) == str:
+        keys = ['%06d|%s' % (-prefer.find(x), x) for x in values]
+        print keys, prefer
+        return sorted(values, key=lambda x: '%-06d|%s' % (-prefer.find(x), x))
+    else:
+        return sorted(values)
 
 def parse():
     """Parse a record file into named tuples, correcting for loop

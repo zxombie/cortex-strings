@@ -9,8 +9,17 @@ import libplot
 import pylab
 import pdb
 
+def pretty_kb(v):
+    if v < 1024:
+        return '%d' % v
+    else:
+        if v % 1024 == 0:
+            return '%d k' % (v//1024)
+        else:
+            return '%.1f k' % (v/1024)
+
 def plot(records, function, alignment=None):
-    variants = libplot.unique(records, 'variant')
+    variants = libplot.unique(records, 'variant', prefer='this')
     records = [x for x in records if x.function==function]
 
     if alignment != None:
@@ -43,10 +52,12 @@ def plot(records, function, alignment=None):
 
     pylab.legend(loc='upper left')
     pylab.grid()
-    pylab.title('%(function)s of %(aalignment)s byte aligned, %(bytes)s byte blocks' % locals())
+    pylab.title('%(function)s of %(aalignment)s byte aligned blocks' % locals())
     pylab.xlabel('Size (B)')
     pylab.ylabel('Rate (MB/s)')
     pylab.semilogx()
+    pylab.axes().set_xticks([2**x for x in range(0, 15)])
+    pylab.axes().set_xticklabels([pretty_kb(2**x) for x in range(0, 15)])
     pylab.xlim(0, max(all_x))
     pylab.ylim(0, pylab.ylim()[1])
 
@@ -54,10 +65,14 @@ def main():
     records = libplot.parse()
 
     functions = libplot.unique(records, 'function')
+    alignments = libplot.unique(records, 'alignment')
 
     for function in functions:
-        plot(records, function)
-        pylab.savefig('sizes-%s.png' % function)
+        for alignment in alignments:
+            plot(records, function, alignment)
+            pylab.savefig('sizes-%s-%d.png' % (function, alignment))
+
+    pylab.show()
 
 if __name__ == '__main__':
     main()

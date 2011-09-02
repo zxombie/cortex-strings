@@ -16,7 +16,7 @@ def plot(records, bytes):
     functions = libplot.unique(records, 'function')
 
     X = pylab.arange(len(functions))
-    width = 1.0/(len(X)+1)
+    width = 1.0/(len(variants)+1)
 
     colours = iter('bgrcmyk')
 
@@ -36,6 +36,7 @@ def plot(records, bytes):
 
         pylab.bar(X+i*width, heights, width, color=colours.next(), label=variant)
 
+    print X, width
     axes = pylab.axes()
     axes.set_xticklabels(functions)
     axes.set_xticks(X + 0.5)
