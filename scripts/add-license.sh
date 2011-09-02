@@ -40,6 +40,11 @@ sed -r 's/(.*)/ * \1/' $f/original >> $f/c
 echo " */" >> $f/c
 echo >> $f/c
 
+# ...and shell style
+sed -r 's/(.*)/# \1/' $f/original >> $f/shell
+echo '#' >> $f/shell
+echo >> $f/shell
+
 for name in $@; do
     if grep -q Copyright $name; then
 	echo $name already has some type of copyright
@@ -47,8 +52,21 @@ for name in $@; do
     fi
 
     case $name in
+	# These files don't have an explicit license
+        *autogen.sh*)
+	    continue;;
+	*reference/newlib/*)
+	    continue;;
+	*reference/newlib-xscale/*)
+	    continue;;
+	*/dhry/*)
+	    continue;;
+
 	*.c)
 	    src=$f/c
+	    ;;
+	*.sh|*.am|*.ac)
+	    src=$f/shell
 	    ;;
 	*)
 	    echo Unrecognied extension on $name
