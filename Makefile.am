@@ -84,6 +84,7 @@ libcortex_strings_la_SOURCES = \
 	src/linaro-a9/memchr.s \
 	src/linaro-a9/strchr.s \
 	src/linaro-a9/strlen.s \
+	src/linaro-a9/memcpy-hybrid.S \
 	src/linaro-a9/memset.S
 
 # Options for the tests
