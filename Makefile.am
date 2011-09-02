@@ -32,11 +32,14 @@ COMPILER = $(shell $(CC) --version 2>&1 | head -n1)
 if WITH_NEON
 # Pull in the NEON specific files
 neon_sources = \
-	src/neon/memcpy.S
+	src/linaro-a9/memcpy-hybrid.S
 neon_bionic_sources = \
 	reference/bionic/memcpy.S
 neon_cppflags = -mfpu=neon
 neon_dirs = neon
+else
+alternate_sources = \
+	src/linaro-a9/memcpy.S
 endif
 
 # The main library
@@ -79,12 +82,12 @@ noinst_LIBRARIES = \
 # Main library
 libcortex_strings_la_SOURCES = \
 	$(neon_sources) \
+	$(alternate_sources) \
 	src/thumb-2/strcmp.c \
 	src/thumb-2/strcpy.c \
 	src/linaro-a9/memchr.s \
 	src/linaro-a9/strchr.s \
 	src/linaro-a9/strlen.s \
-	src/linaro-a9/memcpy-hybrid.S \
 	src/linaro-a9/memset.S
 
 # Options for the tests
