@@ -11,14 +11,15 @@ import pylab
 def plot(records, bytes, function):
     records = [x for x in records if x.bytes==bytes and x.function==function]
 
-    variants = libplot.unique(records, 'variant')
+    variants = libplot.unique(records, 'variant', prefer='this')
     alignments = libplot.unique(records, 'alignment')
 
     X = pylab.arange(len(alignments))
-    width = 1.0/(len(X)+1)
+    width = 1.0/(len(variants)+1)
 
     colours = iter('bgrcmyk')
 
+    pylab.figure(1).set_size_inches((16, 12))
     pylab.clf()
 
     for i, variant in enumerate(variants):
@@ -35,15 +36,16 @@ def plot(records, bytes, function):
 
         pylab.bar(X+i*width, heights, width, color=colours.next(), label=variant)
 
+
     axes = pylab.axes()
     axes.set_xticklabels(alignments)
     axes.set_xticks(X + 0.5)
 
     pylab.title('Performance of different variants of %(function)s for %(bytes)d byte blocks' % locals())
     pylab.ylabel('Rate (MB/s)')
-    pylab.legend(loc='upper left', ncol=2)
+    pylab.legend(loc='upper left', ncol=3)
     pylab.grid()
-    pylab.savefig('alignment-%(function)s-%(bytes)d.png' % locals())
+    pylab.savefig('alignment-%(function)s-%(bytes)d.png' % locals(), dpi=72)
 
 def main():
     records = libplot.parse()

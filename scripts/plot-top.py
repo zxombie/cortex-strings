@@ -20,13 +20,14 @@ def plot(records, bytes):
 
     colours = iter('bgrcmyk')
 
+    pylab.figure(1).set_size_inches((16, 12))
     pylab.clf()
 
     for i, variant in enumerate(variants):
         heights = []
 
         for function in functions:
-            matches = [x for x in records if x.variant==variant and x.function==function]
+            matches = [x for x in records if x.variant==variant and x.function==function and x.alignment==8]
 
             if matches:
                 match = matches[0]
@@ -36,25 +37,23 @@ def plot(records, bytes):
 
         pylab.bar(X+i*width, heights, width, color=colours.next(), label=variant)
 
-    print X, width
     axes = pylab.axes()
     axes.set_xticklabels(functions)
     axes.set_xticks(X + 0.5)
 
     pylab.title('Performance of different variants for %d byte blocks' % bytes)
     pylab.ylabel('Rate (MB/s)')
-    pylab.legend()
+    pylab.legend(loc='upper left', ncol=3)
     pylab.grid()
-    pylab.savefig('top-%d.png' % bytes)
+    pylab.savefig('top-%06d.png' % bytes, dpi=72)
 
 def main():
     records = libplot.parse()
 
-    for bytes in [1, 8, 31, 64, 128]:
+    for bytes in libplot.unique(records, 'bytes'):
         plot(records, bytes)
 
     pylab.show()
 
 if __name__ == '__main__':
     main()
-

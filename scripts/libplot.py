@@ -24,8 +24,6 @@ def unique(records, name, prefer=''):
     if not values:
         return values
     elif type(values[0]) == str:
-        keys = ['%06d|%s' % (-prefer.find(x), x) for x in values]
-        print keys, prefer
         return sorted(values, key=lambda x: '%-06d|%s' % (-prefer.find(x), x))
     else:
         return sorted(values)
