@@ -44,27 +44,27 @@ memset:
   mov   r3, r0          @ Leave r0 alone
   cbz   r2, 10f         @ Exit if 0 length
 
-  tst   r0, #15
-  beq   2f
+  tst   r0, #7
+  beq   2f              @ Already aligned
 
   @ Ok, so we're misaligned here
 1:
   strb  r1, [r3], #1
   subs  r2,r2,#1
-  tst   r3, #15
+  tst   r3, #7
   cbz   r2, 10f          @ Exit if we hit the end
   bne   1b               @ go round again if still misaligned
 
 2:
   @ OK, so we're aligned
   push {r4,r5,r6,r7}
-  bics  r4, r2, #15      @ if less than $align then need to finish it off
+  bics  r4, r2, #15      @ if less than 16 bytes then need to finish it off
   beq   5f
 
 3:
   @ POSIX says that ch is cast to an unsigned char.  A uxtb is one
   @ byte and takes two cycles, where an AND is four bytes but one
-  @ cycle...
+  @ cycle.
   and   r1, #0xFF
   orr   r1, r1, r1, lsl#8  @ Same character into all bytes
   orr   r1, r1, r1, lsl#16
