@@ -36,6 +36,7 @@ strchr:
   @ r0 = start of string
   @ r1 = character to match
   @ returns NULL for no match, or a pointer to the match
+  and r1,r1, #255
 
 1:
   ldrb     r2,[r0],#1
