@@ -266,4 +266,3 @@ memcpy:
 	sub	r1,r1,#1
 	pop	{r3,r4,r5,r6,r7,r8,r10,r11,r12,r14}
 	b	10b
-

@@ -102,4 +102,3 @@ strlenendtmp:
 	subs	r0, r0, #1
 	pop	{ r4, r6 }
 	bx	lr
-

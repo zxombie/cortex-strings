@@ -148,4 +148,3 @@ memchr:
 	pop	{r4,r5,r6,r7}
 	subs	r0,r0,#1
 	bx	lr
-

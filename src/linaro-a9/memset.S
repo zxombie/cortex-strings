@@ -116,4 +116,3 @@ memset:
 
 10:
 	bx	lr		@ goodbye
-

@@ -79,7 +79,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 All third party routines are under a GPL compatible license.
 
 == Notes and Limitations ==
-This is an early release that contains Cortex-A8 with NEON focused
-routines.  Most of the implementations have been collected from other
-projects and have a variety of licenses and copyright holders.  Future
-releases will tidy this up.
+Some of the implementations have been collected from other
+projects and have a variety of licenses and copyright holders.
+
+== Style ==
+Assembly code attempts to follow the GLIBC coding convetions.  They
+are:
+ * Copyright headers in C style comment blocks
+ * Instructions indented with one tab
+ * Operands indented with one tab
+ * Text is wrapped at 70 characters
+ * End of line comments are fine
