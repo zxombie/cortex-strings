@@ -1,7 +1,7 @@
 = Cortex-A String Routines =
 
 This package contains optimised string routines including memcpy(),
-memset(), strcpy(), strlen(), and strcmp() for the ARM Cortex-A series
+memset(), strcpy(), strlen(), and for the ARM Cortex-A series
 of processors.  Variants are available for the Cortex-A8 and
 Cortex-A9, as well as variants that make use of the optional NEON
 unit.

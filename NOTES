@@ -10,15 +10,12 @@ CC="gcc-4.4 -fno-stack-protector -U_FORTIFY_SOURCE" \
             --enable-profile --without-selinux --enable-stackguard-randomization \
             --with-cpu=cortex-a8
 
-As at 2011-08-30, the routines are:
+As at 2011-09-15, the routines are:
  * From Linaro:
   * memchr
-  * strchr
-  * strlen
- * From Bionic:
   * memcpy
   * memset
- * From ARM:
-  * strcmp
-  * strcpy
+  * strchr
   * strlen
+ * From ARM:
+  * strcpy

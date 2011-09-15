@@ -83,7 +83,6 @@ noinst_LIBRARIES = \
 libcortex_strings_la_SOURCES = \
 	$(neon_sources) \
 	$(alternate_sources) \
-	src/thumb-2/strcmp.c \
 	src/thumb-2/strcpy.c \
 	src/linaro-a9/memchr.s \
 	src/linaro-a9/strchr.s \
