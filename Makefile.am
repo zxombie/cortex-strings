@@ -203,19 +203,3 @@ EXTRA_DIST = \
 	tests/test-string.h \
 	tests/test-skeleton.c \
 	autogen.sh
-
-add_on_dist = add-on-dist
-add_on_dest = $(add_on_dist)/$(PACKAGE)/sysdeps/arm/eabi/arm/$(submachine)
-add_on_dirs = thumb-2 $(submachine) $(neon_dirs)
-
-add_on_src = \
-	$(wildcard $(add_on_dirs:%=$(srcdir)/src/%/*.c)) \
-	$(wildcard $(add_on_dirs:%=$(srcdir)/src/%/*.S)) \
-	$(wildcard $(add_on_dirs:%=$(srcdir)/src/%/*.h))
-
-add-on:
-	rm -rf $(add_on_dist)
-	mkdir -p $(add_on_dest)
-	cp -f $(add_on_src) $(add_on_dest)
-	python $(srcdir)/scripts/fixup.py GLIBC $(add_on_dest)/*
-	tar cf $(PACKAGE).tar -C $(add_on_dist) .
