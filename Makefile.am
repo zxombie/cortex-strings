@@ -89,6 +89,8 @@ libcortex_strings_la_SOURCES = \
 	src/linaro-a9/strlen.s \
 	src/linaro-a9/memset.S
 
+libcortex_strings_la_LDFLAGS = -version-info 1:0:0
+
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
 tests_ldadd = libcortex-strings.la
