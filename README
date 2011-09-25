@@ -1,15 +1,18 @@
 = Cortex-A String Routines =
 
 This package contains optimised string routines including memcpy(),
-memset(), strcpy(), strlen(), and for the ARM Cortex-A series
-of processors.  Variants are available for the Cortex-A8 and
-Cortex-A9, as well as variants that make use of the optional NEON
-unit.
+memset(), strcpy(), strlen() for the ARM Cortex-A series
+of processors.  These routines were optimised for the Cortex-A9, work
+well on the Cortex-A8, and include variants that can make use of the
+NEON SIMD unit.
 
 == Getting started ==
 First configure and then install libcortex-strings.so.  To make other
 applications use this library, either add -lcortex-strings to the link
 command or use LD_PRELOAD to load the library into existing applications.
+
+Our intent is to get these routines into the common C libraries such
+as GLIBC, Bionic, and Newlib.  Your system may already include them!
 
 == Contents ==
  * src/  contains the routines themselves

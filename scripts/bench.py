@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+"""Simple harness that benchmarks different variants of the routines,
+caches the results, and emits all of the records at the end.
+
+Results are generated for different values of:
+ * Source
+ * Routine
+ * Length
+ * Alignment
+"""
+
 import subprocess
 import math
 import sys
