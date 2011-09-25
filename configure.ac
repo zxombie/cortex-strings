@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 
 AC_INIT(cortex-strings, 1.0~bzr)
-AM_INIT_AUTOMAKE(foreign subdir-objects color-tests)
+AM_INIT_AUTOMAKE(foreign subdir-objects color-tests dist-bzip2)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile)
 AC_PROG_LIBTOOL
