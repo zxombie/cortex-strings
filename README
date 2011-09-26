@@ -37,12 +37,6 @@ The routines were collected from the following releases:
  * Newlib 1.19.0
  * Bionic android-2.3.5_r1
 
-== History ==
-
-See:
- https://blueprints.launchpad.net/linaro/+spec/armv7-string-tuning
-for future work.
-
 == Licensing ==
 All Linaro-authored routines are under the modified BSD license:
 
