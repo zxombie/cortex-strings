@@ -39,6 +39,13 @@
 @    Extracted from local git 6848613a
 
 
+@ this lets us check a flag in a 00/ff byte easily in either endianness
+#ifdef __ARMEB__
+#define CHARTSTMASK(c) 1<<(31-(c*8))
+#else
+#define CHARTSTMASK(c) 1<<(c*8)
+#endif
+
 @-----------------------------------------------------------------------------------------------------------------------------
 	.syntax unified
 	.arch armv7-a
@@ -86,10 +93,10 @@ strlenendtmp:
 	subne	r1,r1,#7
 
 	@ r1 currently points to the 2nd byte of the word containing the 0
-	tst	r2, # (1<<0)	@ 1st character
+	tst	r2, # CHARTSTMASK(0)	@ 1st character
 	bne	10f
 	adds	r1,r1,#1
-	tst	r2, # (1<<8)	@ 2nd character
+	tst	r2, # CHARTSTMASK(1)	@ 2nd character
 	ittt	eq
 	addeq	r1,r1,#1
 	tsteq	r2, # (3<<15)	@ 2nd & 3rd character
