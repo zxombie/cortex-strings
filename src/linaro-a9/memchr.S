@@ -39,6 +39,8 @@
 @    Extracted from local git a5b438d861
 @ 2011-07-14 david.gilbert@linaro.org
 @    Import endianness fix from local git ea786f1b
+@ 2011-12-07 david.gilbert@linaro.org
+@    Removed unneeded cbz from align loop
 
 	.syntax unified
 	.arch armv7-a
@@ -78,7 +80,6 @@ memchr:
 	cmp	r3, r1
 	beq	50f		@ If it matches exit found
 	tst	r0, #7
-	cbz	r2, 40f		@ If we run off the end, exit not found
 	bne	5b		@ If not aligned yet then do next byte
 	
 10:
