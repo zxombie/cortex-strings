@@ -66,6 +66,7 @@ noinst_PROGRAMS = \
 	try-csl \
 	try-glibc \
 	try-newlib \
+	try-newlib-c \
 	try-newlib-xscale \
 	try-plain
 
@@ -75,6 +76,7 @@ noinst_LIBRARIES = \
 	libcsl.a \
 	libglibc.a \
 	libnewlib.a \
+	libnewlib-c.a \
 	libnewlib-xscale.a \
 	libplain.a \
 	libmulti.a
@@ -134,15 +136,19 @@ libglibc_a_SOURCES = \
 	reference/glibc/strlen.S
 
 libnewlib_a_SOURCES = \
-	reference/newlib/memchr.c \
-	reference/newlib/memcpy.c \
-	reference/newlib/memset.c \
-	reference/newlib/strchr.c \
-	reference/newlib/strcmp.c \
+	reference/newlib/memcpy.S \
+	reference/newlib/strcmp.S \
 	reference/newlib/strcpy.c \
 	reference/newlib/strlen.c \
 	reference/newlib/arm_asm.h \
 	reference/newlib/shim.h
+
+libnewlib_c_a_SOURCES = \
+	reference/newlib-c/memchr.c \
+	reference/newlib-c/memcpy.c \
+	reference/newlib-c/memset.c \
+	reference/newlib-c/strchr.c \
+	reference/newlib-c/shim.h
 
 libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/memchr.c \
@@ -178,6 +184,8 @@ try_glibc_SOURCES =
 try_glibc_LDADD = libmulti.a libglibc.a -lrt
 try_newlib_SOURCES =
 try_newlib_LDADD = libmulti.a libnewlib.a -lrt
+try_newlib_c_SOURCES =
+try_newlib_c_LDADD = libmulti.a libnewlib-c.a -lrt
 try_newlib_xscale_SOURCES =
 try_newlib_xscale_LDADD = libmulti.a libnewlib-xscale.a -lrt
 try_plain_SOURCES =
@@ -205,3 +213,5 @@ EXTRA_DIST = \
 	tests/test-string.h \
 	tests/test-skeleton.c \
 	autogen.sh
+
+AM_DISTCHECK_CONFIGURE_FLAGS = --host=arm-linux-gnueabi
