@@ -8,7 +8,7 @@ import pprint
 
 import pylab
 
-Record = collections.namedtuple('Record', 'variant test size loops rawtime comment time bytes rate')
+Record = collections.namedtuple('Record', 'variant test size loops alignment rawtime comment time bytes rate')
 
 def unique(rows, name):
     """Takes a list of values, pulls out the named field, and returns
@@ -76,6 +76,9 @@ def plot(records, field, scale, ylabel):
             v.sort(key=lambda x: x.size)
             V = pylab.array([(x.size, getattr(x, field)) for x in v])
 
+            # Ensure our results appear
+            order = 1 if variant == 'this' else 0
+
             try:
                 # A little hack.  We want the 'all' to be obvious on
                 # the graph
@@ -83,22 +86,21 @@ def plot(records, field, scale, ylabel):
                     pylab.scatter(V[:,0], V[:,1]/scale, label=variant)
                     pylab.plot(V[:,0], V[:,1]/scale)
                 else:
-                    pylab.plot(V[:,0], V[:,1]/scale, label=variant)
+                    pylab.plot(V[:,0], V[:,1]/scale, label=variant, zorder=order)
 
             except Exception, ex:
                 # michaelh1 likes to run this script while the test is
                 # still running which can lead to bad data
-                print ex
+                print ex, 'on %s of %s' % (variant, test)
 
-        pylab.legend(loc='lower right')
-        pylab.semilogx()
+        pylab.legend(loc='lower right', ncol=2, prop={'size': 'small'})
         pylab.xlabel('Block size (B)')
         pylab.ylabel(ylabel)
         pylab.title('%s %s' % (test, field))
         pylab.grid()
 
         pylab.savefig('%s-%s.png' % (test, field), dpi=100)
-        pylab.semilogx()
+        pylab.semilogx(basex=2)
         pylab.savefig('%s-%s-semilog.png' % (test, field), dpi=100)
         pylab.clf()
 
