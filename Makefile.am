@@ -125,6 +125,7 @@ libbionic_a_SOURCES = \
 libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
 
 libbionic_c_a_SOURCES = \
+	reference/bionic-c/bcopy.c \
 	reference/bionic-c/memchr.c \
 	reference/bionic-c/memcmp.c \
 	reference/bionic-c/memcpy.c \
@@ -153,7 +154,10 @@ libglibc_c_a_SOURCES = \
 	reference/glibc-c/strcmp.c \
 	reference/glibc-c/strcpy.c \
 	reference/glibc-c/strlen.c \
-	reference/glibc-c/wordcopy.c
+	reference/glibc-c/wordcopy.c \
+	reference/glibc-c/bp-checks.h \
+	reference/glibc-c/memcopy.h \
+	reference/glibc-c/pagecopy.h
 
 libnewlib_a_SOURCES = \
 	reference/newlib/memcpy.S \
@@ -171,7 +175,8 @@ libnewlib_c_a_SOURCES = \
 	reference/newlib-c/strchr.c \
 	reference/newlib-c/strcmp.c \
 	reference/newlib-c/strcpy.c \
-	reference/newlib-c/strlen.c
+	reference/newlib-c/strlen.c \
+	reference/newlib-c/shim.h
 
 libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/memchr.c \
