@@ -17,16 +17,19 @@ import sys
 # Prefix to the executables
 build = '../build/try-'
 
-DEFAULTS = 'memcpy memset memchr strchr strcmp strcpy strlen'
+ALL = 'memchr memcmp memcpy memset strchr strcmp strcpy strlen'
 
 HAS = {
-    'this': 'bounce ' + DEFAULTS,
-    'bionic': DEFAULTS,
-    'glibc': DEFAULTS,
-    'newlib': DEFAULTS,
-    'newlib-xscale': DEFAULTS,
+    'this': 'bounce memchr memcpy memset strchr strcpy strlen',
+    'bionic': 'memcmp memcpy memset strcmp strcpy strlen',
+    'bionic-c': ALL,
+    'csl': 'memcpy memset',
+    'glibc': 'memcpy memset strlen',
+    'glibc-c': ALL,
+    'newlib': 'memcpy strcmp strcpy strlen',
+    'newlib-c': ALL,
+    'newlib-xscale': 'memchr memcpy memset strchr strcmp strcpy strlen',
     'plain': 'memset memcpy strcmp strcpy',
-    'csl': 'memcpy memset'
 }
 
 def run(cache, variant, function, bytes, loops, alignment=8, quiet=False):
@@ -107,14 +110,14 @@ def run_top(cache):
     step1 = 2.0
     # Test intermediate powers of 1.4
     step2 = 1.4
-
-    # Figure out how many steps get us up to the top
-    steps1 = int(round(math.log(top) / math.log(step1)))
-    steps2 = int(round(math.log(top) / math.log(step2)))
     
     bytes = []
-    bytes.extend([int(step1**x) for x in range(0, steps1+1)])
-    bytes.extend([int(step2**x) for x in range(0, steps2+1)])
+    
+    for step in [step1, step2]:
+        if step:
+            # Figure out how many steps get us up to the top
+            steps = int(round(math.log(top) / math.log(step)))
+            bytes.extend([int(step**x) for x in range(0, steps+1)])
 
     alignments = [8, 16, 4, 1, 2, 32]
 
@@ -138,7 +141,7 @@ def main():
         run_top(cache)
     finally:
         with open(cachename, 'w') as f:
-            for line in cache.values():
+            for line in sorted(cache.values()):
                 print >> f, line
 
 if __name__ == '__main__':
