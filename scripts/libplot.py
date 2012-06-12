@@ -6,6 +6,9 @@ import collections
 Record = collections.namedtuple('Record', 'variant function bytes loops alignment elapsed rest')
 
 
+def make_colours():
+    return iter('m b g r c y k pink orange brown grey'.split())
+
 def parse_value(v):
     """Turn text into a primitive"""
     try:
@@ -28,11 +31,14 @@ def unique(records, name, prefer=''):
     else:
         return sorted(values)
 
+def parse_row(line):
+    return Record(*[parse_value(y) for y in line.split(':')])
+
 def parse():
     """Parse a record file into named tuples, correcting for loop
     overhead along the way.
     """
-    records = [Record(*[parse_value(y) for y in x.split(':')]) for x in fileinput.input()]
+    records = [parse_row(x) for x in fileinput.input()]
 
     # Pull out any bounce values
     costs = {}

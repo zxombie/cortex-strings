@@ -19,7 +19,7 @@ def pretty_kb(v):
         else:
             return '%.1f k' % (v/1024)
 
-def plot(records, function, alignment=None):
+def plot(records, function, alignment=None, scale=1):
     variants = libplot.unique(records, 'variant', prefer='this')
     records = [x for x in records if x.function==function]
 
@@ -32,10 +32,10 @@ def plot(records, function, alignment=None):
 
     bytes = libplot.unique(records, 'bytes')[0]
 
-    colours = iter('bgrcmyk')
+    colours = libplot.make_colours()
     all_x = []
 
-    pylab.figure(1).set_size_inches((16, 12))
+    pylab.figure(1).set_size_inches((6.4*scale, 4.8*scale))
     pylab.clf()
 
     if 'str' in function:
@@ -59,7 +59,7 @@ def plot(records, function, alignment=None):
             pylab.plot(X, Y, c=colour)
             pylab.scatter(X, Y, c=colour, label=variant, edgecolors='none')
 
-    pylab.legend(loc='upper left', ncol=3)
+    pylab.legend(loc='upper left', ncol=3, prop={'size': 'small'})
     pylab.grid()
     pylab.title('%(function)s of %(aalignment)s byte aligned blocks' % locals())
     pylab.xlabel('Size (B)')
@@ -85,11 +85,11 @@ def main():
 
     for function in functions:
         for alignment in alignments:
-            plot(records, function, alignment)
-            pylab.savefig('sizes-%s-%02d.png' % (function, alignment), dpi=72)
+            for scale in [1, 2.5]:
+                plot(records, function, alignment, scale)
+                pylab.savefig('sizes-%s-%02d-%.1f.png' % (function, alignment, scale), dpi=72)
 
     pylab.show()
 
 if __name__ == '__main__':
     main()
-
