@@ -90,9 +90,9 @@ libcortex_strings_la_SOURCES = \
 	$(neon_sources) \
 	$(alternate_sources) \
 	src/thumb-2/strcpy.c \
-	src/linaro-a9/memchr.s \
-	src/linaro-a9/strchr.s \
-	src/linaro-a9/strlen.s \
+	src/linaro-a9/memchr.S \
+	src/linaro-a9/strchr.S \
+	src/linaro-a9/strlen.S \
 	src/linaro-a9/memset.S
 
 libcortex_strings_la_LDFLAGS = -version-info 1:0:0
@@ -244,6 +244,15 @@ EXTRA_DIST = \
 	tests/hp-timing.h \
 	tests/test-string.h \
 	tests/test-skeleton.c \
+	scripts/add-license.sh \
+	scripts/bench.py \
+	scripts/fixup.py \
+	scripts/libplot.py \
+	scripts/plot-align.py \
+	scripts/plot.py \
+	scripts/plot-sizes.py \
+	scripts/plot-top.py \
+	scripts/trim.sh \
 	autogen.sh
 
 AM_DISTCHECK_CONFIGURE_FLAGS = --host=arm-linux-gnueabi
