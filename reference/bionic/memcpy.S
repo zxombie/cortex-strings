@@ -27,34 +27,39 @@
  */
 
 #define __ARM_NEON__
+#define HAVE_32_BYTE_CACHE_LINE
 
 #if defined(__ARM_NEON__)
 
         .text
         .fpu    neon
-
         .global memcpy
         .type memcpy, %function
         .align 4
 
+#ifdef HAVE_32_BYTE_CACHE_LINE
+/* a prefetch distance of 2 cache-lines */
+#define CACHE_LINE_SIZE     32
+#define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*2)
+#else
 /* a prefetch distance of 4 cache-lines works best experimentally */
 #define CACHE_LINE_SIZE     64
 #define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*4)
+#endif
 
 memcpy:
-        .fnstart
+	.fnstart
         .save       {r0, lr}
-        stmfd       sp!, {r0, lr}
-
         /* start preloading as early as possible */
         pld         [r1, #(CACHE_LINE_SIZE*0)]
+        stmfd       sp!, {r0, lr}
         pld         [r1, #(CACHE_LINE_SIZE*1)]
 
         /* do we have at least 16-bytes to copy (needed for alignment below) */
         cmp         r2, #16
         blo         5f
 
-        /* align destination to half cache-line for the write-buffer */
+        /* align destination to cache-line for the write-buffer */
         rsb         r3, r0, #0
         ands        r3, r3, #0xF
         beq         0f
@@ -83,6 +88,26 @@ memcpy:
         pld         [r1, #(CACHE_LINE_SIZE*0)]
         pld         [r1, #(CACHE_LINE_SIZE*1)]
 
+#ifdef HAVE_32_BYTE_CACHE_LINE
+        /* make sure we have at least 32 bytes to copy */
+        subs        r2, r2, #32
+        blo         4f
+
+        /* preload all the cache lines we need.
+         * NOTE: the number of pld below depends on PREFETCH_DISTANCE,
+         * ideally would would increase the distance in the main loop to
+         * avoid the goofy code below. In practice this doesn't seem to make
+         * a big difference.
+         */
+        pld         [r1, #(PREFETCH_DISTANCE)]
+
+1:      /* The main loop copies 32 bytes at a time */
+        vld1.8      {d0  - d3},   [r1]!
+        pld         [r1, #(PREFETCH_DISTANCE)]
+        subs        r2, r2, #32
+        vst1.8      {d0  - d3},   [r0, :128]!
+        bhs         1b
+#else
         /* make sure we have at least 64 bytes to copy */
         subs        r2, r2, #64
         blo         2f
@@ -116,7 +141,7 @@ memcpy:
         subs        r2, r2, #32
         vst1.8      {d0 - d3},  [r0, :128]!
         bhs         3b
-
+#endif
 4:      /* less than 32 left */
         add         r2, r2, #32
         tst         r2, #0x10
@@ -143,17 +168,11 @@ memcpy:
 
         ldmfd       sp!, {r0, lr}
         bx          lr
-        .fnend
+	.fnend
 
 
 #else   /* __ARM_ARCH__ < 7 */
 
-
-	.text
-
-    .global memcpy
-    .type memcpy, %function
-    .align 4
 
 		/*
 		 * Optimized memcpy() for ARM.
@@ -162,12 +181,11 @@ memcpy:
 		 * so we have to preserve R0.
 		 */
 
-memcpy:
+ENTRY(memcpy)
 		/* The stack must always be 64-bits aligned to be compliant with the
 		 * ARM ABI. Since we have to save R0, we might as well save R4
 		 * which we can use for better pipelining of the reads below
 		 */
-        .fnstart
         .save       {r0, r4, lr}
         stmfd       sp!, {r0, r4, lr}
         /* Making room for r5-r11 which will be spilled later */
@@ -504,7 +522,7 @@ copy_last_3_and_return:
         add         sp,  sp, #28
 		ldmfd		sp!, {r0, r4, lr}
 		bx			lr
-        .fnend
+END(memcpy)
 
 
 #endif    /* __ARM_ARCH__ < 7 */
