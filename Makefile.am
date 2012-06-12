@@ -63,8 +63,10 @@ noinst_PROGRAMS = \
 	try-none \
 	try-this \
 	try-bionic \
+	try-bionic-c \
 	try-csl \
 	try-glibc \
+	try-glibc-c \
 	try-newlib \
 	try-newlib-c \
 	try-newlib-xscale \
@@ -73,8 +75,10 @@ noinst_PROGRAMS = \
 # Libraries used in the benchmarks and examples
 noinst_LIBRARIES = \
 	libbionic.a \
+	libbionic-c.a \
 	libcsl.a \
 	libglibc.a \
+	libglibc-c.a \
 	libnewlib.a \
 	libnewlib-c.a \
 	libnewlib-xscale.a \
@@ -112,14 +116,23 @@ TESTS = $(check_PROGRAMS)
 # Libraries containing the difference reference versions
 libbionic_a_SOURCES = \
 	$(neon_bionic_sources) \
-	reference/bionic/memchr.c \
+	reference/bionic/memcmp.S \
 	reference/bionic/memset.S \
-	reference/bionic/strchr.c \
-	reference/bionic/strcmp.c \
-	reference/bionic/strcpy.c \
+	reference/bionic/strcmp.S \
+	reference/bionic/strcpy.S \
 	reference/bionic/strlen.c
 
 libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
+
+libbionic_c_a_SOURCES = \
+	reference/bionic-c/memchr.c \
+	reference/bionic-c/memcmp.c \
+	reference/bionic-c/memcpy.c \
+	reference/bionic-c/memset.c \
+	reference/bionic-c/strchr.c \
+	reference/bionic-c/strcmp.c \
+	reference/bionic-c/strcpy.c \
+	reference/bionic-c/strlen.c
 
 libcsl_a_SOURCES = \
 	reference/csl/memcpy.c \
@@ -127,13 +140,20 @@ libcsl_a_SOURCES = \
 	reference/csl/arm_asm.h
 
 libglibc_a_SOURCES = \
-	reference/glibc/memchr.c \
 	reference/glibc/memcpy.S \
 	reference/glibc/memset.S \
-	reference/glibc/strchr.c \
-	reference/glibc/strcmp.c \
-	reference/glibc/strcpy.c \
 	reference/glibc/strlen.S
+
+libglibc_c_a_SOURCES = \
+	reference/glibc-c/memchr.c \
+	reference/glibc-c/memcmp.c \
+	reference/glibc-c/memcpy.c \
+	reference/glibc-c/memset.c \
+	reference/glibc-c/strchr.c \
+	reference/glibc-c/strcmp.c \
+	reference/glibc-c/strcpy.c \
+	reference/glibc-c/strlen.c \
+	reference/glibc-c/wordcopy.c
 
 libnewlib_a_SOURCES = \
 	reference/newlib/memcpy.S \
@@ -145,10 +165,13 @@ libnewlib_a_SOURCES = \
 
 libnewlib_c_a_SOURCES = \
 	reference/newlib-c/memchr.c \
+	reference/newlib-c/memcmp.c \
 	reference/newlib-c/memcpy.c \
 	reference/newlib-c/memset.c \
 	reference/newlib-c/strchr.c \
-	reference/newlib-c/shim.h
+	reference/newlib-c/strcmp.c \
+	reference/newlib-c/strcpy.c \
+	reference/newlib-c/strlen.c
 
 libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/memchr.c \
@@ -178,10 +201,14 @@ try_this_SOURCES =
 try_this_LDADD = libmulti.a libcortex-strings.la -lrt
 try_bionic_SOURCES =
 try_bionic_LDADD = libmulti.a libbionic.a -lrt
+try_bionic_c_SOURCES =
+try_bionic_c_LDADD = libmulti.a libbionic-c.a -lrt
 try_csl_SOURCES =
 try_csl_LDADD = libmulti.a libcsl.a -lrt
 try_glibc_SOURCES =
 try_glibc_LDADD = libmulti.a libglibc.a -lrt
+try_glibc_c_SOURCES =
+try_glibc_c_LDADD = libmulti.a libglibc-c.a -lrt
 try_newlib_SOURCES =
 try_newlib_LDADD = libmulti.a libnewlib.a -lrt
 try_newlib_c_SOURCES =
