@@ -49,8 +49,9 @@
 #define push            lsr
 #endif
 
-		.text
-	.globl memcpy
+	.text
+	.global	memcpy
+	.type	memcpy, %function
 
 /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
 

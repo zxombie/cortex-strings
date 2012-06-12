@@ -30,6 +30,8 @@
  */
 
 	.globl strcpy
+	.type strcpy, %function
+	.text
 
 strcpy:
 	.fnstart

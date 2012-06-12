@@ -29,6 +29,7 @@
 
 	.text
 	.globl strcmp
+	.type strcmp, %function
 	
 #ifdef __ARMEB__
 #define SHFT2LSB lsl

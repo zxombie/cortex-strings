@@ -21,7 +21,9 @@
  * entry: r0 -> string
  * exit: r0 = len
  */
+	.text
 	.globl strlen
+	.type strlen, %function
 	
 strlen:	
 	bic     r1, r0, $3              @ addr of word containing first byte

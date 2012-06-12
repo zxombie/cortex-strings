@@ -26,16 +26,14 @@
  * SUCH DAMAGE.
  */
 
-#define __ARM_NEON__
-#define HAVE_32_BYTE_CACHE_LINE
+//#define HAVE_32_BYTE_CACHE_LINE
 
 #if defined(__ARM_NEON__)
 
-        .text
         .fpu    neon
-        .global memcpy
-        .type memcpy, %function
-        .align 4
+	.global memcpy
+	.type memcpy, %function
+	.text
 
 #ifdef HAVE_32_BYTE_CACHE_LINE
 /* a prefetch distance of 2 cache-lines */

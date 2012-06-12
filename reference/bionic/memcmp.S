@@ -26,11 +26,9 @@
  * SUCH DAMAGE.
  */
 
-    .text
-
-    .global memcmp
-    .type memcmp, %function
-    .align 4
+	.global memcmp
+	.type memcmp, %function
+	.text
 
 /*
  * Optimized memcmp() for ARM9.

@@ -18,8 +18,10 @@
    02111-1307 USA.  */
 
 /* void *memset (dstpp, c, len) */
-	.globl memset
-
+	.text
+	.global	memset
+	.type	memset, %function
+	
 memset:	
 	mov	r3, r0
 	cmp	r2, #8
