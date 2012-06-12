@@ -50,6 +50,7 @@
 #endif
 
 		.text
+	.globl memcpy
 
 /* Prototype: void *memcpy(void *dest, const void *src, size_t n); */
 

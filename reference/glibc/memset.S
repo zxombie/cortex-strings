@@ -18,6 +18,7 @@
    02111-1307 USA.  */
 
 /* void *memset (dstpp, c, len) */
+	.globl memset
 
 memset:	
 	mov	r3, r0

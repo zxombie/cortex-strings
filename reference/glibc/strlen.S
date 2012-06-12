@@ -21,7 +21,8 @@
  * entry: r0 -> string
  * exit: r0 = len
  */
-
+	.globl strlen
+	
 strlen:	
 	bic     r1, r0, $3              @ addr of word containing first byte
 	ldr     r2, [r1], $4            @ get the first word
