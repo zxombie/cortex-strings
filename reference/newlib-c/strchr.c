@@ -33,10 +33,10 @@ QUICKREF
 	strchr ansi pure
 */
 
+#include "shim.h"
 #include <string.h>
 #include <limits.h>
 
-#include "shim.h"
 #undef strchr
 
 /* Nonzero if X is not aligned on a "long" boundary.  */
