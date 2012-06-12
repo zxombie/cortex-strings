@@ -94,6 +94,12 @@ static void xmemset(void *dest, void *src, size_t n)
   SPOIL(memset(dest, 0, n));
 }
 
+/** Stub that calls memcmp */
+static void xmemcmp(void *dest, void *src, size_t n)
+{
+  SPOIL(memcmp(dest, src, n));
+}
+
 /** Stub that calls strcpy */
 static void xstrcpy(void *dest, void *src, size_t n)
 {
@@ -135,6 +141,7 @@ static const struct test tests[] =
     { "memchr", xmemchr },
     { "memcpy", xmemcpy },
     { "memset", xmemset },
+    { "memcmp", xmemcmp },
     { "strchr", xstrchr },
     { "strcmp", xstrcmp },
     { "strcpy", xstrcpy },
