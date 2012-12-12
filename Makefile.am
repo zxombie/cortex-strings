@@ -272,7 +272,7 @@ AM_CFLAGS = \
 
 if WITH_SUBMACHINE
 AM_CFLAGS += \
-	-mtune=$submachine
+	-mtune=$(submachine)
 endif
 
 EXTRA_DIST = \
