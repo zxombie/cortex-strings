@@ -46,10 +46,14 @@ check_PROGRAMS = \
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
 tests_ldadd = libcortex-strings.la
+tests_test_memchr_LDADD = $(tests_ldadd)
+tests_test_memchr_CFLAGS = $(tests_cflags)
 tests_test_memcpy_LDADD = $(tests_ldadd)
 tests_test_memcpy_CFLAGS = $(tests_cflags)
 tests_test_memset_LDADD = $(tests_ldadd)
 tests_test_memset_CFLAGS = $(tests_cflags)
+tests_test_strchr_LDADD = $(tests_ldadd)
+tests_test_strchr_CFLAGS = $(tests_cflags)
 tests_test_strcmp_LDADD = $(tests_ldadd)
 tests_test_strcmp_CFLAGS = $(tests_cflags)
 tests_test_strcpy_LDADD = $(tests_ldadd)
