@@ -32,7 +32,7 @@ AM_PROG_AS
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
-default_submachine=native
+default_submachine=
 
 case $host in
 arm*-*-*)
@@ -63,6 +63,7 @@ AC_ARG_WITH([cpu],
 [submachine=$default_submachine])
 
 AC_SUBST(submachine)
+AM_CONDITIONAL([WITH_SUBMACHINE], [test x$submachine != x])
 
 AC_ARG_WITH([neon],
             AC_HELP_STRING([--with-neon],

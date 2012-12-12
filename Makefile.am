@@ -258,7 +258,12 @@ libcortex_strings_la_LDFLAGS = -version-info 1:0:0
 AM_CFLAGS = \
 	-std=gnu99 -Wall \
 	-fno-builtin -fno-stack-protector -U_FORTIFY_SOURCE \
-	-mtune=$(submachine) $(AM_CPPFLAGS)
+	$(AM_CPPFLAGS)
+
+if WITH_SUBMACHINE
+AM_CFLAGS += \
+	-mtune=$submachine
+endif
 
 EXTRA_DIST = \
 	tests/hp-timing.h \
