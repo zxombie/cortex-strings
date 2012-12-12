@@ -35,6 +35,9 @@ AC_PROG_LIBTOOL
 default_submachine=
 
 case $host in
+aarch64*-*-*)
+  arch=aarch64
+  ;;
 arm*-*-*)
   arch=aarch32
   default_submachine=cortex-a9
@@ -48,6 +51,7 @@ x86_64-*-*-*)
 esac
 
 AM_CONDITIONAL([HOST_AARCH32], [test x$arch = xaarch32])
+AM_CONDITIONAL([HOST_AARCH64], [test x$arch = xaarch64])
 AM_CONDITIONAL([HOST_GENERIC], [test x$arch = xgeneric])
 
 AC_ARG_WITH([cpu],

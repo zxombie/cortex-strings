@@ -253,6 +253,10 @@ AM_CPPFLAGS = $(neon_cppflags)
 
 endif
 
+if HOST_AARCH64
+libcortex_strings_la_SOURCES =
+endif
+
 libcortex_strings_la_LDFLAGS = -version-info 1:0:0
 
 AM_CFLAGS = \
