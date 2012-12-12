@@ -253,8 +253,14 @@ AM_CPPFLAGS = $(neon_cppflags)
 
 endif
 
+# aarch64 specific
 if HOST_AARCH64
-libcortex_strings_la_SOURCES =
+
+libcortex_strings_la_SOURCES = \
+	src/aarch64/memcpy.S \
+	src/aarch64/memset.S \
+	src/aarch64/strcmp.S
+
 endif
 
 libcortex_strings_la_LDFLAGS = -version-info 1:0:0
