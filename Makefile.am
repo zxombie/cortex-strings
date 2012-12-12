@@ -29,24 +29,11 @@
 # Used to record the compiler version in the executables
 COMPILER = $(shell $(CC) --version 2>&1 | head -n1)
 
-if WITH_NEON
-# Pull in the NEON specific files
-neon_sources = \
-	src/linaro-a9/memcpy-hybrid.S
-neon_bionic_sources = \
-	reference/bionic/memcpy.S
-neon_cppflags = -mfpu=neon
-neon_dirs = neon
-else
-alternate_sources = \
-	src/linaro-a9/memcpy.S
-endif
-
 # The main library
 lib_LTLIBRARIES = \
 	libcortex-strings.la
 
-# Test suite
+## Test suite
 check_PROGRAMS = \
 	tests/test-memchr \
 	tests/test-memcpy \
@@ -55,47 +42,6 @@ check_PROGRAMS = \
 	tests/test-strcmp \
 	tests/test-strcpy \
 	tests/test-strlen
-
-# Benchmarks and example programs
-noinst_PROGRAMS = \
-	dhry \
-	dhry-native \
-	try-none \
-	try-this \
-	try-bionic \
-	try-bionic-c \
-	try-csl \
-	try-glibc \
-	try-glibc-c \
-	try-newlib \
-	try-newlib-c \
-	try-newlib-xscale \
-	try-plain
-
-# Libraries used in the benchmarks and examples
-noinst_LIBRARIES = \
-	libbionic.a \
-	libbionic-c.a \
-	libcsl.a \
-	libglibc.a \
-	libglibc-c.a \
-	libnewlib.a \
-	libnewlib-c.a \
-	libnewlib-xscale.a \
-	libplain.a \
-	libmulti.a
-
-# Main library
-libcortex_strings_la_SOURCES = \
-	$(neon_sources) \
-	$(alternate_sources) \
-	src/thumb-2/strcpy.c \
-	src/linaro-a9/memchr.S \
-	src/linaro-a9/strchr.S \
-	src/linaro-a9/strlen.S \
-	src/linaro-a9/memset.S
-
-libcortex_strings_la_LDFLAGS = -version-info 1:0:0
 
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
@@ -113,17 +59,43 @@ tests_test_strlen_CFLAGS = $(tests_cflags)
 
 TESTS = $(check_PROGRAMS)
 
-# Libraries containing the difference reference versions
-libbionic_a_SOURCES = \
-	$(neon_bionic_sources) \
-	reference/bionic/memcmp.S \
-	reference/bionic/memset.S \
-	reference/bionic/strcmp.S \
-	reference/bionic/strcpy.S \
-	reference/bionic/strlen.c
+## Benchmarks
+noinst_PROGRAMS = \
+	dhry \
+	dhry-native \
+	try-none \
+	try-this \
+	try-plain \
+	try-newlib-c \
+	try-bionic-c \
+	try-glibc-c
 
-libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
+# Good 'ol Dhrystone
+dhry_SOURCES = \
+	benchmarks/dhry/dhry_1.c \
+	benchmarks/dhry/dhry_2.c \
+	benchmarks/dhry/dhry.h
 
+dhry_CFLAGS = -Dcompiler="\"$(COMPILER)\"" -Doptions="\"$(CFLAGS)\""
+dhry_LDADD = libcortex-strings.la
+
+dhry_native_SOURCES = $(dhry_SOURCES)
+dhry_native_CFLAGS = $(dhry_CFLAGS)
+
+# Benchmark harness
+noinst_LIBRARIES = \
+	libmulti.a \
+	libbionic-c.a \
+	libglibc-c.a \
+	libnewlib-c.a \
+	libplain.a
+
+libmulti_a_SOURCES = \
+	benchmarks/multi/harness.c
+
+libmulti_a_CFLAGS = -DVERSION=\"$(VERSION)\" $(AM_CFLAGS)
+
+## Other architecture independant implementaions
 libbionic_c_a_SOURCES = \
 	reference/bionic-c/bcopy.c \
 	reference/bionic-c/memchr.c \
@@ -134,16 +106,6 @@ libbionic_c_a_SOURCES = \
 	reference/bionic-c/strcmp.c \
 	reference/bionic-c/strcpy.c \
 	reference/bionic-c/strlen.c
-
-libcsl_a_SOURCES = \
-	reference/csl/memcpy.c \
-	reference/csl/memset.c \
-	reference/csl/arm_asm.h
-
-libglibc_a_SOURCES = \
-	reference/glibc/memcpy.S \
-	reference/glibc/memset.S \
-	reference/glibc/strlen.S
 
 libglibc_c_a_SOURCES = \
 	reference/glibc-c/memchr.c \
@@ -159,14 +121,6 @@ libglibc_c_a_SOURCES = \
 	reference/glibc-c/memcopy.h \
 	reference/glibc-c/pagecopy.h
 
-libnewlib_a_SOURCES = \
-	reference/newlib/memcpy.S \
-	reference/newlib/strcmp.S \
-	reference/newlib/strcpy.c \
-	reference/newlib/strlen.c \
-	reference/newlib/arm_asm.h \
-	reference/newlib/shim.h
-
 libnewlib_c_a_SOURCES = \
 	reference/newlib-c/memchr.c \
 	reference/newlib-c/memcmp.c \
@@ -178,6 +132,97 @@ libnewlib_c_a_SOURCES = \
 	reference/newlib-c/strlen.c \
 	reference/newlib-c/shim.h
 
+libplain_a_SOURCES = \
+	reference/plain/memset.c \
+	reference/plain/memcpy.c \
+	reference/plain/strcmp.c \
+	reference/plain/strcpy.c
+
+try_none_SOURCES =
+try_none_LDADD = libmulti.a -lrt
+try_this_SOURCES =
+try_this_LDADD = libmulti.a libcortex-strings.la -lrt
+try_bionic_c_SOURCES =
+try_bionic_c_LDADD = libmulti.a libbionic-c.a -lrt
+try_glibc_c_SOURCES =
+try_glibc_c_LDADD = libmulti.a libglibc-c.a -lrt
+try_newlib_c_SOURCES =
+try_newlib_c_LDADD = libmulti.a libnewlib-c.a -lrt
+try_plain_SOURCES =
+try_plain_LDADD = libmulti.a libplain.a -lrt
+
+# Architecture specific
+
+if HOST_AARCH32
+
+if WITH_NEON
+# Pull in the NEON specific files
+neon_sources = \
+	src/linaro-a9/memcpy-hybrid.S
+neon_bionic_sources = \
+	reference/bionic/memcpy.S
+neon_cppflags = -mfpu=neon
+neon_dirs = neon
+else
+alternate_sources = \
+	src/linaro-a9/memcpy.S
+endif
+
+# Benchmarks and example programs
+noinst_PROGRAMS += \
+	try-bionic \
+	try-csl \
+	try-glibc \
+	try-newlib \
+	try-newlib-xscale
+
+# Libraries used in the benchmarks and examples
+noinst_LIBRARIES += \
+	libbionic.a \
+	libcsl.a \
+	libglibc.a \
+	libnewlib.a \
+	libnewlib-xscale.a
+
+# Main library
+libcortex_strings_la_SOURCES = \
+	$(neon_sources) \
+	$(alternate_sources) \
+	src/thumb-2/strcpy.c \
+	src/linaro-a9/memchr.S \
+	src/linaro-a9/strchr.S \
+	src/linaro-a9/strlen.S \
+	src/linaro-a9/memset.S
+
+# Libraries containing the difference reference versions
+libbionic_a_SOURCES = \
+	$(neon_bionic_sources) \
+	reference/bionic/memcmp.S \
+	reference/bionic/memset.S \
+	reference/bionic/strcmp.S \
+	reference/bionic/strcpy.S \
+	reference/bionic/strlen.c
+
+libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
+
+libcsl_a_SOURCES = \
+	reference/csl/memcpy.c \
+	reference/csl/memset.c \
+	reference/csl/arm_asm.h
+
+libglibc_a_SOURCES = \
+	reference/glibc/memcpy.S \
+	reference/glibc/memset.S \
+	reference/glibc/strlen.S
+
+libnewlib_a_SOURCES = \
+	reference/newlib/memcpy.S \
+	reference/newlib/strcmp.S \
+	reference/newlib/strcpy.c \
+	reference/newlib/strlen.c \
+	reference/newlib/arm_asm.h \
+	reference/newlib/shim.h
+
 libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/memchr.c \
 	reference/newlib-xscale/memcpy.c \
@@ -188,55 +233,26 @@ libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/strlen.c \
 	reference/newlib-xscale/xscale.h
 
-libplain_a_SOURCES = \
-	reference/plain/memset.c \
-	reference/plain/memcpy.c \
-	reference/plain/strcmp.c \
-	reference/plain/strcpy.c
-
-libmulti_a_SOURCES = \
-	benchmarks/multi/harness.c
-
-libmulti_a_CFLAGS = -DVERSION=\"$(VERSION)\" $(AM_CFLAGS)
-
 # Flags for the benchmark helpers
-try_none_SOURCES =
-try_none_LDADD = libmulti.a -lrt
-try_this_SOURCES =
-try_this_LDADD = libmulti.a libcortex-strings.la -lrt
 try_bionic_SOURCES =
 try_bionic_LDADD = libmulti.a libbionic.a -lrt
-try_bionic_c_SOURCES =
-try_bionic_c_LDADD = libmulti.a libbionic-c.a -lrt
 try_csl_SOURCES =
 try_csl_LDADD = libmulti.a libcsl.a -lrt
 try_glibc_SOURCES =
 try_glibc_LDADD = libmulti.a libglibc.a -lrt
-try_glibc_c_SOURCES =
-try_glibc_c_LDADD = libmulti.a libglibc-c.a -lrt
 try_newlib_SOURCES =
 try_newlib_LDADD = libmulti.a libnewlib.a -lrt
-try_newlib_c_SOURCES =
-try_newlib_c_LDADD = libmulti.a libnewlib-c.a -lrt
 try_newlib_xscale_SOURCES =
 try_newlib_xscale_LDADD = libmulti.a libnewlib-xscale.a -lrt
-try_plain_SOURCES =
-try_plain_LDADD = libmulti.a libplain.a -lrt
-
-# Good 'ol Dhrystone
-dhry_SOURCES = \
-	benchmarks/dhry/dhry_1.c \
-	benchmarks/dhry/dhry_2.c \
-	benchmarks/dhry/dhry.h
-
-dhry_CFLAGS = -Dcompiler="\"$(COMPILER)\"" -Doptions="\"$(CFLAGS)\""
-dhry_LDADD = libcortex-strings.la
-
-dhry_native_SOURCES = $(dhry_SOURCES)
-dhry_native_CFLAGS = $(dhry_CFLAGS)
 
 AM_CPPFLAGS = $(neon_cppflags)
-AM_CFLAGS = -std=gnu99 -Wall \
+
+endif
+
+libcortex_strings_la_LDFLAGS = -version-info 1:0:0
+
+AM_CFLAGS = \
+	-std=gnu99 -Wall \
 	-fno-builtin -fno-stack-protector -U_FORTIFY_SOURCE \
 	-mtune=$(submachine) $(AM_CPPFLAGS)
 
@@ -254,5 +270,3 @@ EXTRA_DIST = \
 	scripts/plot-top.py \
 	scripts/trim.sh \
 	autogen.sh
-
-AM_DISTCHECK_CONFIGURE_FLAGS = --host=arm-linux-gnueabi

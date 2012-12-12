@@ -32,6 +32,24 @@ AM_PROG_AS
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+default_submachine=native
+
+case $host in
+arm*-*-*)
+  arch=aarch32
+  default_submachine=cortex-a9
+  ;;
+x86_64-*-*-*)
+  arch=generic
+  ;;
+*)
+  AC_MSG_ERROR([unknown architecture $host])
+  ;;
+esac
+
+AM_CONDITIONAL([HOST_AARCH32], [test x$arch = xaarch32])
+AM_CONDITIONAL([HOST_GENERIC], [test x$arch = xgeneric])
+
 AC_ARG_WITH([cpu],
 	    AS_HELP_STRING([--with-cpu=CPU],
                            [select code for CPU variant @<:@default=cortex-a9@:>@]]),
@@ -42,7 +60,7 @@ AC_ARG_WITH([cpu],
   *) submachine="$withval" ;;
   esac
 ],
-[submachine=cortex-a9])
+[submachine=$default_submachine])
 
 AC_SUBST(submachine)
 
