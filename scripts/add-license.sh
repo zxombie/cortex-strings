@@ -31,17 +31,17 @@ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EOF
 
 # Translate it to C style
 echo "/*" > $f/c
-sed -r 's/(.*)/ * \1/' $f/original >> $f/c
+sed -r 's/(.*)/ * \1/' $f/original | sed -r 's/ +$//' >> $f/c
 echo " */" >> $f/c
 echo >> $f/c
 
 # ...and shell style
-sed -r 's/(.*)/# \1/' $f/original >> $f/shell
+sed -r 's/(.*)/# \1/' $f/original | sed -r 's/ +$//' >> $f/shell
 echo '#' >> $f/shell
 echo >> $f/shell
 
