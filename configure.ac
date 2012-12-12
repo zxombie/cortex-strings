@@ -27,8 +27,10 @@ AC_INIT(cortex-strings, 1.1-2012.06~dev)
 AM_INIT_AUTOMAKE(foreign subdir-objects color-tests dist-bzip2)
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES(Makefile)
-AC_PROG_LIBTOOL
+AC_CANONICAL_HOST
 AM_PROG_AS
+AC_PROG_CC
+AC_PROG_LIBTOOL
 
 AC_ARG_WITH([cpu],
 	    AS_HELP_STRING([--with-cpu=CPU],
