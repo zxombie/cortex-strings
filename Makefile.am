@@ -269,7 +269,8 @@ libcortex_strings_la_SOURCES = \
 	src/aarch64/memcpy.S \
 	src/aarch64/memmove.S \
 	src/aarch64/memset.S \
-	src/aarch64/strcmp.S
+	src/aarch64/strcmp.S \
+	src/aarch64/strncmp.S
 
 endif
 
