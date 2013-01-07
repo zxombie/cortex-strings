@@ -37,6 +37,7 @@ lib_LTLIBRARIES = \
 check_PROGRAMS = \
 	tests/test-memchr \
 	tests/test-memcpy \
+	tests/test-memmove \
 	tests/test-memset \
 	tests/test-strchr \
 	tests/test-strcmp \
@@ -50,6 +51,8 @@ tests_test_memchr_LDADD = $(tests_ldadd)
 tests_test_memchr_CFLAGS = $(tests_cflags)
 tests_test_memcpy_LDADD = $(tests_ldadd)
 tests_test_memcpy_CFLAGS = $(tests_cflags)
+tests_test_memmove_LDADD = $(tests_ldadd)
+tests_test_memmove_CFLAGS = $(tests_cflags)
 tests_test_memset_LDADD = $(tests_ldadd)
 tests_test_memset_CFLAGS = $(tests_cflags)
 tests_test_strchr_LDADD = $(tests_ldadd)
