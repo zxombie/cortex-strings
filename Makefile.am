@@ -44,7 +44,8 @@ check_PROGRAMS = \
 	tests/test-strcmp \
 	tests/test-strcpy \
 	tests/test-strlen \
-	tests/test-strncmp
+	tests/test-strncmp \
+	tests/test-strnlen
 
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
