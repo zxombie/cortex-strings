@@ -43,7 +43,8 @@ check_PROGRAMS = \
 	tests/test-strchr \
 	tests/test-strcmp \
 	tests/test-strcpy \
-	tests/test-strlen
+	tests/test-strlen \
+	tests/test-strncmp
 
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
@@ -66,6 +67,8 @@ tests_test_strcpy_LDADD = $(tests_ldadd)
 tests_test_strcpy_CFLAGS = $(tests_cflags)
 tests_test_strlen_LDADD = $(tests_ldadd)
 tests_test_strlen_CFLAGS = $(tests_cflags)
+tests_test_strncmp_LDADD = $(tests_ldadd)
+tests_test_strncmp_CFLAGS = $(tests_cflags)
 
 TESTS = $(check_PROGRAMS)
 
