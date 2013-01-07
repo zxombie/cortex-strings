@@ -36,6 +36,7 @@ lib_LTLIBRARIES = \
 ## Test suite
 check_PROGRAMS = \
 	tests/test-memchr \
+	tests/test-memcmp \
 	tests/test-memcpy \
 	tests/test-memmove \
 	tests/test-memset \
@@ -49,6 +50,8 @@ tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
 tests_ldadd = libcortex-strings.la
 tests_test_memchr_LDADD = $(tests_ldadd)
 tests_test_memchr_CFLAGS = $(tests_cflags)
+tests_test_memcmp_LDADD = $(tests_ldadd)
+tests_test_memcmp_CFLAGS = $(tests_cflags)
 tests_test_memcpy_LDADD = $(tests_ldadd)
 tests_test_memcpy_CFLAGS = $(tests_cflags)
 tests_test_memmove_LDADD = $(tests_ldadd)
