@@ -44,7 +44,8 @@ check_PROGRAMS = \
 	tests/test-strcmp \
 	tests/test-strcpy \
 	tests/test-strlen \
-	tests/test-strncmp
+	tests/test-strncmp \
+	tests/test-strnlen
 
 # Options for the tests
 tests_cflags = -I$(srcdir)/tests $(AM_CFLAGS)
@@ -266,12 +267,14 @@ endif
 if HOST_AARCH64
 
 libcortex_strings_la_SOURCES = \
+	src/aarch64/memcmp.S \
 	src/aarch64/memcpy.S \
 	src/aarch64/memmove.S \
 	src/aarch64/memset.S \
 	src/aarch64/strcmp.S \
 	src/aarch64/strlen.S \
-	src/aarch64/strncmp.S
+	src/aarch64/strncmp.S \
+	src/aarch64/strnlen.S
 
 endif
 
