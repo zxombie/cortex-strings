@@ -1,10 +1,11 @@
 = Cortex-A String Routines =
 
-This package contains optimised string routines including memcpy(),
-memset(), strcpy(), strlen() for the ARM Cortex-A series
-of processors.  These routines were optimised for the Cortex-A9, work
-well on the Cortex-A8, and include variants that can make use of the
-NEON SIMD unit.
+This package contains optimised string routines including memcpy(), memset(),
+strcpy(), strlen() for the ARM Cortex-A series of cores.
+
+Various implementations of these routines are provided, including generic
+implementations for ARMv7-A cores with/without Neon, an implementation tuned
+for Cortex-A9 and generic implementations for cores supporting AArch64.
 
 == Getting started ==
 First configure and then install libcortex-strings.so.  To make other
@@ -24,8 +25,10 @@ as GLIBC, Bionic, and Newlib.  Your system may already include them!
 
 The src directory contains different variants organised by the
 implementation they run on and optional features used.  For example:
-  * src/thumb-2  contains generic non-NEON routines for all processors
-  * src/neon  contains NEON based routines for all processors
+  * src/thumb-2  contains generic non-NEON routines for AArch32 (with Thumb-2).
+  * src/neon  contains NEON based routines for AArch32.
+  * src/linaro-a9  contains tuned routines for Cortex-A9 processors.
+  * src/aarch64  contains generic routines for AArch64.
 
 == Reference versions ==
 reference/ contains versions collected from various popular Open
