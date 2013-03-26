@@ -171,15 +171,15 @@ if HOST_AARCH32
 
 if WITH_NEON
 # Pull in the NEON specific files
-neon_sources = \
-	src/linaro-a9/memcpy-hybrid.S
 neon_bionic_sources = \
 	reference/bionic/memcpy.S
-neon_cppflags = -mfpu=neon
-neon_dirs = neon
+fpu_flags = -mfpu=neon
 else
-alternate_sources = \
-	src/linaro-a9/memcpy.S
+if WITH_VFP
+fpu_flags = -mfpu=vfp
+else
+fpu_flags = -msoft-float
+endif
 endif
 
 # Benchmarks and example programs
@@ -200,13 +200,12 @@ noinst_LIBRARIES += \
 
 # Main library
 libcortex_strings_la_SOURCES = \
-	$(neon_sources) \
-	$(alternate_sources) \
 	src/thumb-2/strcpy.c \
 	src/linaro-a9/memchr.S \
 	src/linaro-a9/strchr.S \
 	src/linaro-a9/strlen.S \
-	src/linaro-a9/memset.S
+	src/linaro-a9/memset.S \
+	src/linaro-a9/memcpy.S
 
 # Libraries containing the difference reference versions
 libbionic_a_SOURCES = \
@@ -259,7 +258,8 @@ try_newlib_LDADD = libmulti.a libnewlib.a -lrt
 try_newlib_xscale_SOURCES =
 try_newlib_xscale_LDADD = libmulti.a libnewlib-xscale.a -lrt
 
-AM_CPPFLAGS = $(neon_cppflags)
+AM_CPPFLAGS = $(fpu_flags)
+AM_LDFLAGS = $(fpu_flags)
 
 endif
 

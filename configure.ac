@@ -77,4 +77,12 @@ AC_ARG_WITH([neon],
 AC_SUBST(with_neon)
 AM_CONDITIONAL(WITH_NEON, test x$with_neon = xyes)
 
+AC_ARG_WITH([vfp],
+            AC_HELP_STRING([--with-vfp],
+                           [include VFP specific routines @<:@default=yes@:>@]),
+	    [with_vfp=$withval],
+	    [with_vfp=yes])
+AC_SUBST(with_vfp)
+AM_CONDITIONAL(WITH_VFP, test x$with_vfp = xyes)
+
 AC_OUTPUT
