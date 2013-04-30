@@ -171,8 +171,12 @@ if HOST_AARCH32
 
 if WITH_NEON
 # Pull in the NEON specific files
-neon_bionic_sources = \
-	reference/bionic/memcpy.S
+neon_bionic_a9_sources = \
+	reference/bionic-a9/memcpy.S \
+	reference/bionic-a9/memset.S
+neon_bionic_a15_sources = \
+	reference/bionic-a15/memcpy.S \
+	reference/bionic-a15/memset.S
 fpu_flags = -mfpu=neon
 else
 if WITH_VFP
@@ -184,7 +188,8 @@ endif
 
 # Benchmarks and example programs
 noinst_PROGRAMS += \
-	try-bionic \
+	try-bionic-a9 \
+	try-bionic-a15 \
 	try-csl \
 	try-glibc \
 	try-newlib \
@@ -192,7 +197,8 @@ noinst_PROGRAMS += \
 
 # Libraries used in the benchmarks and examples
 noinst_LIBRARIES += \
-	libbionic.a \
+	libbionic-a9.a \
+	libbionic-a15.a \
 	libcsl.a \
 	libglibc.a \
 	libnewlib.a \
@@ -208,15 +214,23 @@ libcortex_strings_la_SOURCES = \
 	src/linaro-a9/memcpy.S
 
 # Libraries containing the difference reference versions
-libbionic_a_SOURCES = \
-	$(neon_bionic_sources) \
-	reference/bionic/memcmp.S \
-	reference/bionic/memset.S \
-	reference/bionic/strcmp.S \
-	reference/bionic/strcpy.S \
-	reference/bionic/strlen.c
+libbionic_a9_a_SOURCES = \
+	$(neon_bionic_a9_sources) \
+	reference/bionic-a9/memcmp.S \
+	reference/bionic-a9/strcmp.S \
+	reference/bionic-a9/strcpy.S \
+	reference/bionic-a9/strlen.c
 
-libbionic_a_CFLAGS = -Wa,-mimplicit-it=thumb
+libbionic_a9_a_CFLAGS = -Wa,-mimplicit-it=thumb
+
+libbionic_a15_a_SOURCES = \
+	$(neon_bionic_a15_sources) \
+	reference/bionic-a15/memcmp.S \
+	reference/bionic-a15/strcmp.S \
+	reference/bionic-a15/strcpy.S \
+	reference/bionic-a15/strlen.c
+
+libbionic_a15_a_CFLAGS = -Wa,-mimplicit-it=thumb
 
 libcsl_a_SOURCES = \
 	reference/csl/memcpy.c \
@@ -247,8 +261,10 @@ libnewlib_xscale_a_SOURCES = \
 	reference/newlib-xscale/xscale.h
 
 # Flags for the benchmark helpers
-try_bionic_SOURCES =
-try_bionic_LDADD = libmulti.a libbionic.a -lrt
+try_bionic_a9_SOURCES =
+try_bionic_a9_LDADD = libmulti.a libbionic-a9.a -lrt
+try_bionic_a15_SOURCES =
+try_bionic_a15_LDADD = libmulti.a libbionic-a15.a -lrt
 try_csl_SOURCES =
 try_csl_LDADD = libmulti.a libcsl.a -lrt
 try_glibc_SOURCES =
