@@ -28,6 +28,7 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+   Assumes:
    ARMv7, AArch32
  */
 
@@ -65,45 +66,50 @@
 #define tmp2		r5
 
 def_fn	strlen p2align=6
-	pld	[src, #0]
+	pld	[srcin, #0]
 	strd	r4, r5, [sp, #-8]!
 	bic	src, srcin, #7
 	mvn	const_m1, #0
-	ands	tmp1, srcin, #7		/* (4 - bytes) to alignment.  */
+	ands	tmp1, srcin, #7		/* (8 - bytes) to alignment.  */
 	pld	[src, #32]
 	bne.w	.Lmisaligned8
 	mov	const_0, #0
+	mov	result, #-8
 .Lloop_aligned:
 	/* Bytes 0-7.  */
 	ldrd	data1a, data1b, [src]
 	pld	[src, #64]
-	add	src, src, #8
+	add	result, result, #8
 .Lstart_realigned:
 	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
 	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
 	uadd8	data1b, data1b, const_m1
 	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
 	cbnz	data1b, .Lnull_found
-	
+
 	/* Bytes 8-15.  */
-	ldrd	data1a, data1b, [src], #8
+	ldrd	data1a, data1b, [src, #8]
 	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	add	result, result, #8
 	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
 	uadd8	data1b, data1b, const_m1
 	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
 	cbnz	data1b, .Lnull_found
 
 	/* Bytes 16-23.  */
-	ldrd	data1a, data1b, [src], #8
+	ldrd	data1a, data1b, [src, #16]
 	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	add	result, result, #8
 	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
 	uadd8	data1b, data1b, const_m1
 	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
 	cbnz	data1b, .Lnull_found
 
 	/* Bytes 24-31.  */
-	ldrd	data1a, data1b, [src], #8
+	ldrd	data1a, data1b, [src, #24]
+	add	src, src, #32
 	uadd8	data1a, data1a, const_m1	/* Saturating GE<0:3> set.  */
+	add	result, result, #8
 	sel	data1a, const_0, const_m1	/* Select based on GE<0:3>.  */
 	uadd8	data1b, data1b, const_m1
 	sel	data1b, data1a, const_m1	/* Only used if d1a == 0.  */
@@ -113,24 +119,23 @@ def_fn	strlen p2align=6
 .Lnull_found:
 	cmp	data1a, #0
 	itt	eq
-	addeq	src, src, #4
+	addeq	result, result, #4
 	moveq	data1a, data1b
-	sub	src, src, #8		/* We've gone too far.  */
 #ifndef __ARMEB__
 	rev	data1a, data1a
 #endif
-	sub	src, src, srcin
 	clz	data1a, data1a
 	ldrd	r4, r5, [sp], #8
-	add	result, src, data1a, lsr #3	/* Bits -> Bytes.  */
+	add	result, result, data1a, lsr #3	/* Bits -> Bytes.  */
 	bx	lr
 
 .Lmisaligned8:
-	ldrd	data1a, data1b, [src], #8
+	ldrd	data1a, data1b, [src]
 	and	tmp2, tmp1, #3
+	rsb	result, tmp1, #0
 	lsl	tmp2, tmp2, #3			/* Bytes -> bits.  */
 	tst	tmp1, #4
-	pld	[src, #56]			/* Src incremented above.  */
+	pld	[src, #64]
 	S2HI	tmp2, const_m1, tmp2
 	orn	data1a, data1a, tmp2
 	itt	ne
@@ -139,3 +144,4 @@ def_fn	strlen p2align=6
 	mov	const_0, #0
 	b	.Lstart_realigned
 	.size	strlen, . - strlen
+
