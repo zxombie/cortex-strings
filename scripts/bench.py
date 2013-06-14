@@ -59,20 +59,21 @@ def run(cache, variant, function, bytes, loops, alignment=8, quiet=False):
 
     return took
 
-def run_many(cache, variants, bytes, alignments):
+def run_many(cache, variants, bytes, alignments, all_functions):
     # We want the data to come out in a useful order.  So fix an
     # alignment and function, and do all sizes for a variant first
     bytes = sorted(bytes)
     mid = bytes[len(bytes)/2]
 
-    # Use the ordering in 'this' as the default
-    all_functions = HAS['this'].split()
+    if not all_functions:
+        # Use the ordering in 'this' as the default
+        all_functions = HAS['this'].split()
 
-    # Find all other functions
-    for functions in HAS.values():
-        for function in functions.split():
-            if function not in all_functions:
-                all_functions.append(function)
+        # Find all other functions
+        for functions in HAS.values():
+            for function in functions.split():
+                if function not in all_functions:
+                    all_functions.append(function)
 
     for alignment in alignments:
         for function in all_functions:
@@ -104,6 +105,7 @@ def run_many(cache, variants, bytes, alignments):
 
 def run_top(cache):
     variants = sorted(HAS.keys())
+    functions = sys.argv[1:]
 
     # Upper limit in bytes to test to
     top = 512*1024
@@ -122,7 +124,7 @@ def run_top(cache):
 
     alignments = [8, 16, 4, 1, 2, 32]
 
-    run_many(cache, variants, bytes, alignments)
+    run_many(cache, variants, bytes, alignments, functions)
 
 def main():
     cachename = 'cache.txt'
