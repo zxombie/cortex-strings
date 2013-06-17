@@ -204,14 +204,13 @@ static char *realign(char *p, int alignment)
   return (char *)pp;
 }
 
+#define MIN_BUFFER_SIZE 1024*1024
+
 /** Setup and run a test */
 int main(int argc, char **argv)
 {
-  /* Buffers to read and write from */
-  char *src = calloc(1024, 1024);
-  char *dest = calloc(1024, 1024);
-
-  assert(src != NULL && dest != NULL);
+  /* Size of src and dest buffers */
+  size_t buffer_size = MIN_BUFFER_SIZE;
 
   /* Number of bytes per call */
   int count = 31;
@@ -268,13 +267,27 @@ int main(int argc, char **argv)
       usage(argv[0]);
     }
 
+  if (alignment == 256)
+    alignment = 0;
+
+  if (count + alignment > MIN_BUFFER_SIZE)
+    {
+      buffer_size = count + alignment;
+    }
+
+  /* Buffers to read and write from */
+  char *src = malloc(buffer_size);
+  char *dest = malloc(buffer_size);
+
+  assert(src != NULL && dest != NULL);
+
   src = realign(src, alignment);
   dest = realign(dest, alignment);
 
-  /* Fill the first 16 k with non-zero, reproducable random data */
+  /* Fill the buffer with non-zero, reproducable random data */
   srandom(1539);
 
-  for (int i = 0; i < 16*1024; i++)
+  for (int i = 0; i < buffer_size; i++)
     {
       src[i] = (char)random() | 1;
       dest[i] = src[i];
