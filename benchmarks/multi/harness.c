@@ -261,18 +261,18 @@ int main(int argc, char **argv)
       usage(argv[0]);
     }
 
-  if (alignment > 256 || alignment < 0)
+  if (alignment > 256 || alignment < 1)
     {
-      printf("Alignment should be in the range [0, 256].\n");
+      printf("Alignment should be in the range [1, 256].\n");
       usage(argv[0]);
     }
 
   if (alignment == 256)
     alignment = 0;
 
-  if (count + alignment > MIN_BUFFER_SIZE)
+  if (count + alignment + 256 > MIN_BUFFER_SIZE)
     {
-      buffer_size = count + alignment;
+      buffer_size = count + alignment + 256;
     }
 
   /* Buffers to read and write from */
