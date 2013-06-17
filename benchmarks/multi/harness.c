@@ -222,7 +222,7 @@ int main(int argc, char **argv)
   /* Name of the test */
   const char *name = NULL;
   /* Alignment of both buffers */
-  int alignment = -1;
+  int alignment = 8;
 
   int opt;
 
