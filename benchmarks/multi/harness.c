@@ -262,6 +262,12 @@ int main(int argc, char **argv)
       usage(argv[0]);
     }
 
+  if (alignment > 256 || alignment < 0)
+    {
+      printf("Alignment should be in the range [0, 256].\n");
+      usage(argv[0]);
+    }
+
   src = realign(src, alignment);
   dest = realign(dest, alignment);
 
