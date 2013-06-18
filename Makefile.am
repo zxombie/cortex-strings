@@ -209,7 +209,7 @@ libcortex_strings_la_SOURCES = \
 	src/thumb-2/strcpy.c \
 	src/linaro-a9/memchr.S \
 	src/linaro-a9/strchr.S \
-	src/linaro-a9/strlen.S \
+	src/thumb-2/strlen.S \
 	src/linaro-a9/memset.S \
 	src/linaro-a9/memcpy.S
 
