@@ -29,7 +29,7 @@
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    Assumes:
-   ARMv7, AArch32
+   ARMv6T2, AArch32
  */
 
 	.macro def_fn f p2align=0
