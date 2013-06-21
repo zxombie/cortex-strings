@@ -27,7 +27,7 @@ def plot(records, bytes):
         heights = []
 
         for function in functions:
-            matches = [x for x in records if x.variant==variant and x.function==function and x.alignment==8]
+            matches = [x for x in records if x.variant==variant and x.function==function and x.src_alignment==8]
 
             if matches:
                 match = matches[0]

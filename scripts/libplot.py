@@ -3,7 +3,7 @@
 import fileinput
 import collections
 
-Record = collections.namedtuple('Record', 'variant function bytes loops alignment elapsed rest')
+Record = collections.namedtuple('Record', 'variant function bytes loops src_alignment dst_alignment elapsed rest')
 
 
 def make_colours():
@@ -19,10 +19,16 @@ def parse_value(v):
     except ValueError:
         return v
 
+def create_column_tuple(record, names):
+    cols = [getattr(record, name) for name in names]
+    return tuple(cols)
 
 def unique(records, name, prefer=''):
     """Return the unique values of a column in the records"""
-    values = list(set(getattr(x, name) for x in records))
+    if type(name) == tuple:
+        values = list(set(create_column_tuple(x, name) for x in records))
+    else:
+        values = list(set(getattr(x, name) for x in records))
 
     if not values:
         return values
@@ -30,6 +36,12 @@ def unique(records, name, prefer=''):
         return sorted(values, key=lambda x: '%-06d|%s' % (-prefer.find(x), x))
     else:
         return sorted(values)
+
+def alignments_equal(alignments):
+    for alignment in alignments:
+        if alignment[0] != alignment[1]:
+            return False
+    return True
 
 def parse_row(line):
     return Record(*[parse_value(y) for y in line.split(':')])

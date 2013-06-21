@@ -39,7 +39,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <unistd.h>
-#include <assert.h>
+#include <errno.h>
 
 #define NUM_ELEMS(_x) (sizeof(_x) / sizeof((_x)[0]))
 
@@ -153,7 +153,7 @@ static const struct test tests[] =
 static void usage(const char* name)
 {
   printf("%s %s: run a string related benchmark.\n"
-         "usage: %s [-c block-size] [-l loop-count] [-a alignment] [-f] [-t test-name]\n"
+         "usage: %s [-c block-size] [-l loop-count] [-a alignment|src_alignment:dst_alignment] [-f] [-t test-name]\n"
          , name, VERSION, name);
 
   printf("Tests:");
@@ -189,22 +189,81 @@ static const struct test *find_test(const char *name)
   return NULL;
 }
 
+#define MIN_BUFFER_SIZE 1024*1024
+#define MAX_ALIGNMENT	256
+
 /** Take a pointer and ensure that the lower bits == alignment */
 static char *realign(char *p, int alignment)
 {
-  if (alignment < 0)
-    {
-      return p;
-    }
-
   uintptr_t pp = (uintptr_t)p;
-  pp = (pp + 255) & ~255;
+  pp = (pp + (MAX_ALIGNMENT - 1)) & ~(MAX_ALIGNMENT - 1);
   pp += alignment;
 
   return (char *)pp;
 }
 
-#define MIN_BUFFER_SIZE 1024*1024
+static int parse_int_arg(const char *arg, const char *exe_name)
+{
+  long int ret;
+
+  errno = 0;
+  ret = strtol(arg, NULL, 0);
+
+  if (errno)
+    {
+      usage(exe_name);
+    }
+
+  return (int)ret;
+}
+
+static void parse_alignment_arg(const char *arg, const char *exe_name,
+				int *src_alignment, int *dst_alignment)
+{
+  long int ret;
+  char *endptr;
+
+  errno = 0;
+  ret = strtol(arg, &endptr, 0);
+
+  if (errno)
+    {
+      usage(exe_name);
+    }
+
+  *src_alignment = (int)ret;
+
+  if (ret > 256 || ret < 1)
+    {
+      printf("Alignment should be in the range [1, 256].\n");
+      usage(exe_name);
+    }
+
+  if (ret == 256)
+    ret = 0;
+
+  if (endptr && *endptr == ':')
+    {
+      errno = 0;
+      ret = strtol(endptr + 1, NULL, 0);
+
+      if (errno)
+	{
+	  usage(exe_name);
+	}
+
+      if (ret > 256 || ret < 1)
+	{
+	  printf("Alignment should be in the range [1, 256].\n");
+	  usage(exe_name);
+	}
+
+      if (ret == 256)
+	ret = 0;
+    }
+
+  *dst_alignment = (int)ret;
+}
 
 /** Setup and run a test */
 int main(int argc, char **argv)
@@ -220,8 +279,9 @@ int main(int argc, char **argv)
   int flush = 0;
   /* Name of the test */
   const char *name = NULL;
-  /* Alignment of both buffers */
-  int alignment = 8;
+  /* Alignment of buffers */
+  int src_alignment = 8;
+  int dst_alignment = 8;
 
   int opt;
 
@@ -230,13 +290,13 @@ int main(int argc, char **argv)
       switch (opt)
 	{
 	case 'c':
-          count = atoi(optarg);
+          count = parse_int_arg(optarg, argv[0]);
           break;
 	case 'l':
-          loops = atoi(optarg);
+          loops = parse_int_arg(optarg, argv[0]);
           break;
 	case 'a':
-          alignment = atoi(optarg);
+          parse_alignment_arg(optarg, argv[0], &src_alignment, &dst_alignment);
           break;
 	case 'f':
           flush = 1;
@@ -261,18 +321,9 @@ int main(int argc, char **argv)
       usage(argv[0]);
     }
 
-  if (alignment > 256 || alignment < 1)
+  if (count + MAX_ALIGNMENT * 2 > MIN_BUFFER_SIZE)
     {
-      printf("Alignment should be in the range [1, 256].\n");
-      usage(argv[0]);
-    }
-
-  if (alignment == 256)
-    alignment = 0;
-
-  if (count + alignment + 256 > MIN_BUFFER_SIZE)
-    {
-      buffer_size = count + alignment + 256;
+      buffer_size = count + MAX_ALIGNMENT * 2;
     }
 
   /* Buffers to read and write from */
@@ -281,8 +332,8 @@ int main(int argc, char **argv)
 
   assert(src != NULL && dest != NULL);
 
-  src = realign(src, alignment);
-  dest = realign(dest, alignment);
+  src = realign(src, src_alignment);
+  dest = realign(dest, dst_alignment);
 
   /* Fill the buffer with non-zero, reproducable random data */
   srandom(1539);
@@ -340,9 +391,9 @@ int main(int argc, char **argv)
   double bounced = 0.448730 * loops / 50000000;
 
   /* Dump both machine and human readable versions */
-  printf("%s:%s:%u:%u:%d:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s corrected.\n", 
+  printf("%s:%s:%u:%u:%d:%d:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s corrected.\n", 
          variant + 4, ptest->name,
-	 count, loops, alignment,
+	 count, loops, src_alignment, dst_alignment,
 	 elapsed,
          elapsed, loops, ptest->name, count,
          (double)loops*count/(elapsed - bounced)/(1024*1024));

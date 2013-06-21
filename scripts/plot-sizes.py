@@ -24,11 +24,16 @@ def plot(records, function, alignment=None, scale=1):
     records = [x for x in records if x.function==function]
 
     if alignment != None:
-        records = [x for x in records if x.alignment==alignment]
+        records = [x for x in records if x.src_alignment==alignment[0] and
+                   x.dst_alignment==alignment[1]]
 
-    alignments = libplot.unique(records, 'alignment')
-    assert len(alignments) == 1
-    aalignment = alignments[0]
+    alignments = libplot.unique(records, ('src_alignment', 'dst_alignment'))
+    if len(alignments) != 1:
+        return False
+    if libplot.alignments_equal(alignments):
+        aalignment = alignments[0][0]
+    else:
+        aalignment = "%s:%s" % (alignments[0][0], alignments[0][1])
 
     bytes = libplot.unique(records, 'bytes')[0]
 
@@ -76,18 +81,19 @@ def plot(records, function, alignment=None, scale=1):
     pylab.axes().set_xticklabels([pretty_kb(2**x) for x in range(0, power+1)])
     pylab.xlim(0, top)
     pylab.ylim(0, pylab.ylim()[1])
+    return True
 
 def main():
     records = libplot.parse()
 
     functions = libplot.unique(records, 'function')
-    alignments = libplot.unique(records, 'alignment')
+    alignments = libplot.unique(records, ('src_alignment', 'dst_alignment'))
 
     for function in functions:
         for alignment in alignments:
             for scale in [1, 2.5]:
-                plot(records, function, alignment, scale)
-                pylab.savefig('sizes-%s-%02d-%.1f.png' % (function, alignment, scale), dpi=72)
+                if plot(records, function, alignment, scale):
+                    pylab.savefig('sizes-%s-%02d-%02d-%.1f.png' % (function, alignment[0], alignment[1], scale), dpi=72)
 
     pylab.show()
 

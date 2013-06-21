@@ -12,7 +12,7 @@ def plot(records, bytes, function):
     records = [x for x in records if x.bytes==bytes and x.function==function]
 
     variants = libplot.unique(records, 'variant', prefer='this')
-    alignments = libplot.unique(records, 'alignment')
+    alignments = libplot.unique(records, ('src_alignment', 'dst_alignment'))
 
     X = pylab.arange(len(alignments))
     width = 1.0/(len(variants)+1)
@@ -26,7 +26,7 @@ def plot(records, bytes, function):
         heights = []
 
         for alignment in alignments:
-            matches = [x for x in records if x.variant==variant and x.alignment==alignment]
+            matches = [x for x in records if x.variant==variant and x.src_alignment==alignment[0] and x.dst_alignment==alignment[1]]
 
             if matches:
                 match = matches[0]
@@ -38,7 +38,11 @@ def plot(records, bytes, function):
 
 
     axes = pylab.axes()
-    axes.set_xticklabels(alignments)
+    if libplot.alignments_equal(alignments):
+        alignment_labels = ["%s" % x[0] for x in alignments]
+    else:
+        alignment_labels = ["%s:%s" % (x[0], x[1]) for x in alignments]
+    axes.set_xticklabels(alignment_labels)
     axes.set_xticks(X + 0.5)
 
     pylab.title('Performance of different variants of %(function)s for %(bytes)d byte blocks' % locals())

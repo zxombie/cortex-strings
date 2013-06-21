@@ -33,7 +33,23 @@ HAS = {
     'plain': 'memset memcpy strcmp strcpy',
 }
 
-def run(cache, variant, function, bytes, loops, alignment=8, quiet=False):
+BOUNCE_ALIGNMENTS = ['1']
+SINGLE_BUFFER_ALIGNMENTS = ['1', '2', '4', '8', '16', '32']
+DUAL_BUFFER_ALIGNMENTS = ['1:32', '2:32', '4:32', '8:32', '16:32', '32:32']
+
+ALIGNMENTS = {
+    'bounce': BOUNCE_ALIGNMENTS,
+    'memchr': SINGLE_BUFFER_ALIGNMENTS,
+    'memset': SINGLE_BUFFER_ALIGNMENTS,
+    'strchr': SINGLE_BUFFER_ALIGNMENTS,
+    'strlen': SINGLE_BUFFER_ALIGNMENTS,
+    'memcmp': DUAL_BUFFER_ALIGNMENTS,
+    'memcpy': DUAL_BUFFER_ALIGNMENTS,
+    'strcmp': DUAL_BUFFER_ALIGNMENTS,
+    'strcpy': DUAL_BUFFER_ALIGNMENTS,
+}
+
+def run(cache, variant, function, bytes, loops, alignment, quiet=False):
     """Perform a single run, exercising the cache as appropriate."""
     key = ':'.join('%s' % x for x in (variant, function, bytes, loops, alignment))
 
@@ -49,7 +65,7 @@ def run(cache, variant, function, bytes, loops, alignment=8, quiet=False):
             assert False, 'Error %s while running %s' % (ex, cmd)
 
     parts = got.split(':')
-    took = float(parts[5])
+    took = float(parts[6])
 
     cache[key] = got
 
@@ -59,11 +75,11 @@ def run(cache, variant, function, bytes, loops, alignment=8, quiet=False):
 
     return took
 
-def run_many(cache, variants, bytes, alignments, all_functions):
+def run_many(cache, variants, bytes, all_functions):
     # We want the data to come out in a useful order.  So fix an
     # alignment and function, and do all sizes for a variant first
     bytes = sorted(bytes)
-    mid = bytes[len(bytes)/2]
+    mid = bytes[int(len(bytes)/1.5)]
 
     if not all_functions:
         # Use the ordering in 'this' as the default
@@ -75,8 +91,8 @@ def run_many(cache, variants, bytes, alignments, all_functions):
                 if function not in all_functions:
                     all_functions.append(function)
 
-    for alignment in alignments:
-        for function in all_functions:
+    for function in all_functions:
+        for alignment in ALIGNMENTS[function]:
             for variant in variants:
                 if function not in HAS[variant].split():
                     continue
@@ -122,9 +138,7 @@ def run_top(cache):
             steps = int(round(math.log(top) / math.log(step)))
             bytes.extend([int(step**x) for x in range(0, steps+1)])
 
-    alignments = [8, 16, 4, 1, 2, 32]
-
-    run_many(cache, variants, bytes, alignments, functions)
+    run_many(cache, variants, bytes, functions)
 
 def main():
     cachename = 'cache.txt'
