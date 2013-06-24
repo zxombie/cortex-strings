@@ -150,7 +150,7 @@ def main():
             for line in f:
                 line = line.strip()
                 parts = line.split(':')
-                cache[':'.join(parts[:5])] = line
+                cache[':'.join(parts[:6])] = line
     except:
         pass
 
