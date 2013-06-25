@@ -49,15 +49,17 @@ ALIGNMENTS = {
     'strcpy': DUAL_BUFFER_ALIGNMENTS,
 }
 
-def run(cache, variant, function, bytes, loops, alignment, quiet=False):
+NUM_RUNS = 5
+
+def run(cache, variant, function, bytes, loops, alignment, run_id, quiet=False):
     """Perform a single run, exercising the cache as appropriate."""
-    key = ':'.join('%s' % x for x in (variant, function, bytes, loops, alignment))
+    key = ':'.join('%s' % x for x in (variant, function, bytes, loops, alignment, run_id))
 
     if key in cache:
         got = cache[key]
     else:
         xbuild = build
-        cmd = '%(xbuild)s%(variant)s -t %(function)s -c %(bytes)s -l %(loops)s -a %(alignment)s' % locals()
+        cmd = '%(xbuild)s%(variant)s -t %(function)s -c %(bytes)s -l %(loops)s -a %(alignment)s -r %(run_id)s' % locals()
 
         try:
             got = subprocess.check_output(cmd.split()).strip()
@@ -65,7 +67,7 @@ def run(cache, variant, function, bytes, loops, alignment, quiet=False):
             assert False, 'Error %s while running %s' % (ex, cmd)
 
     parts = got.split(':')
-    took = float(parts[6])
+    took = float(parts[7])
 
     cache[key] = got
 
@@ -105,7 +107,8 @@ def run_many(cache, variants, bytes, all_functions):
                 want = 5.0
 
                 loops = int(f / math.sqrt(max(1, mid)))
-                took = run(cache, variant, function, mid, loops, alignment, quiet=True)
+                took = run(cache, variant, function, mid, loops, alignment, 0,
+                           quiet=True)
                 # Keep it reasonable for silly routines like bounce
                 factor = min(20, max(0.05, want/took))
                 f = f * factor
@@ -117,7 +120,9 @@ def run_many(cache, variants, bytes, all_functions):
                 for b in sorted(bytes):
                     # Figure out the number of loops to give a roughly consistent run
                     loops = int(f / math.sqrt(max(1, b)))
-                    run(cache, variant, function, b, loops, alignment)
+                    for run_id in range(0, NUM_RUNS):
+                        run(cache, variant, function, b, loops, alignment,
+                            run_id)
 
 def run_top(cache):
     variants = sorted(HAS.keys())
@@ -150,7 +155,7 @@ def main():
             for line in f:
                 line = line.strip()
                 parts = line.split(':')
-                cache[':'.join(parts[:6])] = line
+                cache[':'.join(parts[:7])] = line
     except:
         pass
 

@@ -3,7 +3,7 @@
 import fileinput
 import collections
 
-Record = collections.namedtuple('Record', 'variant function bytes loops src_alignment dst_alignment elapsed rest')
+Record = collections.namedtuple('Record', 'variant function bytes loops src_alignment dst_alignment run_id elapsed rest')
 
 
 def make_colours():

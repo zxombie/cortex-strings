@@ -153,7 +153,7 @@ static const struct test tests[] =
 static void usage(const char* name)
 {
   printf("%s %s: run a string related benchmark.\n"
-         "usage: %s [-c block-size] [-l loop-count] [-a alignment|src_alignment:dst_alignment] [-f] [-t test-name]\n"
+         "usage: %s [-c block-size] [-l loop-count] [-a alignment|src_alignment:dst_alignment] [-f] [-t test-name] [-r run-id]\n"
          , name, VERSION, name);
 
   printf("Tests:");
@@ -282,10 +282,12 @@ int main(int argc, char **argv)
   /* Alignment of buffers */
   int src_alignment = 8;
   int dst_alignment = 8;
+  /* Name of the run */
+  const char *run_id = "0";
 
   int opt;
 
-  while ((opt = getopt(argc, argv, "c:l:ft:hva:")) > 0)
+  while ((opt = getopt(argc, argv, "c:l:ft:r:hva:")) > 0)
     {
       switch (opt)
 	{
@@ -303,6 +305,9 @@ int main(int argc, char **argv)
           break;
 	case 't':
           name = strdup(optarg);
+          break;
+	case 'r':
+          run_id = strdup(optarg);
           break;
 	case 'h':
           usage(argv[0]);
@@ -391,9 +396,9 @@ int main(int argc, char **argv)
   double bounced = 0.448730 * loops / 50000000;
 
   /* Dump both machine and human readable versions */
-  printf("%s:%s:%u:%u:%d:%d:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s corrected.\n", 
+  printf("%s:%s:%u:%u:%d:%d:%s:%.6f: took %.6f s for %u calls to %s of %u bytes.  ~%.3f MB/s corrected.\n", 
          variant + 4, ptest->name,
-	 count, loops, src_alignment, dst_alignment,
+	 count, loops, src_alignment, dst_alignment, run_id,
 	 elapsed,
          elapsed, loops, ptest->name, count,
          (double)loops*count/(elapsed - bounced)/(1024*1024));

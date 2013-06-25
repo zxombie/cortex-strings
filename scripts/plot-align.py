@@ -29,8 +29,10 @@ def plot(records, bytes, function):
             matches = [x for x in records if x.variant==variant and x.src_alignment==alignment[0] and x.dst_alignment==alignment[1]]
 
             if matches:
-                match = matches[0]
-                heights.append(match.bytes*match.loops/match.elapsed/(1024*1024))
+                vals = [match.bytes*match.loops/match.elapsed/(1024*1024) for
+                        match in matches]
+                mean = sum(vals)/len(vals)
+                heights.append(mean)
             else:
                 heights.append(0)
 

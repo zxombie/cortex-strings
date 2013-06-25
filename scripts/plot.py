@@ -8,7 +8,7 @@ import pprint
 
 import pylab
 
-Record = collections.namedtuple('Record', 'variant test size loops src_alignment dst_alignment rawtime comment time bytes rate')
+Record = collections.namedtuple('Record', 'variant test size loops src_alignment dst_alignment run_id rawtime comment time bytes rate')
 
 def unique(rows, name):
     """Takes a list of values, pulls out the named field, and returns

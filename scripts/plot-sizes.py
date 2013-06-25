@@ -54,15 +54,34 @@ def plot(records, function, alignment=None, scale=1):
         matches = [x for x in records if x.variant==variant and x.bytes <= top]
         matches.sort(key=lambda x: x.bytes)
 
-        X = [x.bytes for x in matches]
-        Y = [x.bytes*x.loops/x.elapsed/(1024*1024) for x in matches]
+        X = sorted(list(set([x.bytes for x in matches])))
+        Y = []
+        Yerr = []
+        for xbytes in X:
+            vals = [x.bytes*x.loops/x.elapsed/(1024*1024) for x in matches if x.bytes == xbytes]
+            if len(vals) > 1:
+                mean = sum(vals)/len(vals)
+                Y.append(mean)
+                if len(Yerr) == 0:
+                    Yerr = [[], []]
+                err1 = max(vals) - mean
+                assert err1 >= 0
+                err2 = min(vals) - mean
+                assert err2 <= 0
+                Yerr[0].append(abs(err2))
+                Yerr[1].append(err1)
+            else:
+                Y.append(vals[0])
 
         all_x.extend(X)
         colour = colours.next()
 
         if X:
             pylab.plot(X, Y, c=colour)
-            pylab.scatter(X, Y, c=colour, label=variant, edgecolors='none')
+            if len(Yerr) > 0:
+                pylab.errorbar(X, Y, yerr=Yerr, c=colour, label=variant, fmt='o')
+            else:
+                pylab.scatter(X, Y, c=colour, label=variant, edgecolors='none')
 
     pylab.legend(loc='upper left', ncol=3, prop={'size': 'small'})
     pylab.grid()
