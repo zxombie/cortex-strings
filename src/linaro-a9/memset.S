@@ -27,11 +27,15 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
+/*
    Written by Dave Gilbert <david.gilbert@linaro.org>
 
    This memset routine is optimised on a Cortex-A9 and should work on
-   all ARMv7 processors. */
+   all ARMv7 processors.
+
+ */
 
 	.syntax unified
 	.arch armv7-a

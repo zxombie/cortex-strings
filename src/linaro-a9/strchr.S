@@ -27,13 +27,17 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
+/*
    Written by Dave Gilbert <david.gilbert@linaro.org>
 
    A very simple strchr routine, from benchmarks on A9 it's a bit faster than
    the current version in eglibc (2.12.1-0ubuntu14 package)
    I don't think doing a word at a time version is worth it since a lot
-    of strchr cases are very short anyway */
+   of strchr cases are very short anyway.
+
+ */
 
 @ 2011-02-07 david.gilbert@linaro.org
 @    Extracted from local git a5b438d861

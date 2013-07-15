@@ -27,13 +27,17 @@
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
+/*
    Written by Dave Gilbert <david.gilbert@linaro.org>
 
    This memchr routine is optimised on a Cortex-A9 and should work on
    all ARMv7 processors.   It has a fast past for short sizes, and has
    an optimised path for large data sets; the worst case is finding the
-   match early in a large data set. */
+   match early in a large data set.
+
+ */
 
 @ 2011-02-07 david.gilbert@linaro.org
 @    Extracted from local git a5b438d861
