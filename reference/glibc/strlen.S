@@ -1,6 +1,6 @@
-/* Copyright (C) 1998, 2003 Free Software Foundation, Inc.
+/* strlen -- find the length of a nul-terminated string.
+   Copyright (C) 2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Code contributed by Matthew Wilcox <willy@odie.barnet.ac.uk>
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -13,61 +13,87 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library.  If not, see
+   <http://www.gnu.org/licenses/>.  */
 
-/* size_t strlen(const char *S)
- * entry: r0 -> string
- * exit: r0 = len
- */
+#define ARCH_HAS_T2
+	
+	.syntax unified
 	.text
-	.globl strlen
-	.type strlen, %function
-	
-strlen:	
-	bic     r1, r0, $3              @ addr of word containing first byte
-	ldr     r2, [r1], $4            @ get the first word
-	ands    r3, r0, $3              @ how many bytes are duff?
-	rsb     r0, r3, $0              @ get - that number into counter.
-	beq     Laligned                @ skip into main check routine if no
-					@ more
-#ifdef __ARMEB__
-	orr     r2, r2, $0xff000000     @ set this byte to non-zero
-	subs    r3, r3, $1              @ any more to do?
-	orrgt   r2, r2, $0x00ff0000     @ if so, set this byte
-	subs    r3, r3, $1              @ more?
-	orrgt   r2, r2, $0x0000ff00     @ then set.
+	.global strlen
+	.type strlen,%function
+	.align 4
+strlen:
+	@ r0 = start of string
+	ldrb	r2, [r0]		@ load the first byte asap
+
+	@ To cater to long strings, we want to search through a few
+	@ characters until we reach an aligned pointer.  To cater to
+	@ small strings, we don't want to start doing word operations
+	@ immediately.  The compromise is a maximum of 16 bytes less
+	@ whatever is required to end with an aligned pointer.
+	@ r3 = number of characters to search in alignment loop
+	and	r3, r0, #7
+	mov	r1, r0			@ Save the input pointer
+	rsb	r3, r3, #15		@ 16 - 1 peeled loop iteration
+	cmp	r2, #0
+	beq	99f
+
+	@ Loop until we find ...
+1:
+	ldrb	r2, [r0, #1]!
+	subs	r3, r3, #1		@ ... the aligment point
+	it	ne
+	cmpne	r2, #0			@ ... or EOS
+	bne	1b
+
+	@ Disambiguate the exit possibilites above
+	cmp	r2, #0			@ Found EOS
+	beq	99f
+	add	r0, r0, #1
+
+	@ So now we're aligned.
+	ldrd	r2, r3, [r0], #8
+#ifdef ARCH_HAS_T2
+	movw	ip, #0x0101
+	pld	[r0, #64]
+	movt	ip, #0x0101
 #else
-	orr     r2, r2, $0x000000ff     @ set this byte to non-zero
-	subs    r3, r3, $1              @ any more to do?
-	orrgt   r2, r2, $0x0000ff00     @ if so, set this byte
-	subs    r3, r3, $1              @ more?
-	orrgt   r2, r2, $0x00ff0000     @ then set.
+	ldr	ip, =0x01010101
+	pld	[r0, #64]
 #endif
-Laligned:				@ here, we have a word in r2.  Does it
-	tst     r2, $0x000000ff         @ contain any zeroes?
-	tstne   r2, $0x0000ff00         @
-	tstne   r2, $0x00ff0000         @
-	tstne   r2, $0xff000000         @
-	addne   r0, r0, $4              @ if not, the string is 4 bytes longer
-	ldrne   r2, [r1], $4            @ and we continue to the next word
-	bne     Laligned                @
-Llastword:				@ drop through to here once we find a
-#ifdef __ARMEB__
-	tst     r2, $0xff000000         @ word that has a zero byte in it
-	addne   r0, r0, $1              @
-	tstne   r2, $0x00ff0000         @ and add up to 3 bytes on to it
-	addne   r0, r0, $1              @
-	tstne   r2, $0x0000ff00         @ (if first three all non-zero, 4th
-	addne   r0, r0, $1              @  must be zero)
-#else
-	tst     r2, $0x000000ff         @ word that has a zero byte in it
-	addne   r0, r0, $1              @
-	tstne   r2, $0x0000ff00         @ and add up to 3 bytes on to it
-	addne   r0, r0, $1              @
-	tstne   r2, $0x00ff0000         @ (if first three all non-zero, 4th
-	addne   r0, r0, $1              @  must be zero)
+
+	@ Loop searching for EOS, 8 bytes at a time.
+	@ Subtracting (unsigned saturating) from 1 for any byte means that
+	@ we get 1 for any byte that was originally zero and 0 otherwise.
+	@ Therefore we consider the lsb of each byte the "found" bit.
+	.balign	16
+2:	uqsub8	r2, ip, r2		@ Find EOS
+	uqsub8	r3, ip, r3
+	pld	[r0, #128]		@ Prefetch 2 lines ahead
+	orrs	r3, r3, r2		@ Combine the two words
+	it	eq
+	ldrdeq	r2, r3, [r0], #8
+	beq	2b
+
+	@ Found something.  Disambiguate between first and second words.
+	@ Adjust r0 to point to the word containing the match.
+	@ Adjust r2 to the found bits for the word containing the match.
+	cmp	r2, #0
+	sub	r0, r0, #4
+	ite	eq
+	moveq	r2, r3
+	subne	r0, r0, #4
+
+	@ Find the bit-offset of the match within the word.  Note that the
+	@ bit result from clz will be 7 higher than "true", but we'll
+	@ immediately discard those bits converting to a byte offset.
+#ifdef __ARMEL__
+	rev	r2, r2			@ For LE, count from the little end
 #endif
-	bx lr
-	
+	clz	r2, r2
+	add	r0, r0, r2, lsr #3	@ Adjust the pointer to the found byte
+99:
+	sub	r0, r0, r1		@ Subtract input to compute length
+	bx	lr
+	.size strlen,.-strlen
