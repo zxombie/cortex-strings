@@ -38,7 +38,6 @@
     ARMv6 (ARMv7-a if using Neon)
     ARM state
     Unaligned accesses
-    LDRD/STRD support unaligned word accesses
 
  */
 
@@ -354,7 +353,7 @@ def_fn memcpy p2align=6
 
 .Ltail63aligned:			/* Count in tmp2.  */
 	/* Copy up to 7 d-words of data.  Similar to Ltail63unaligned, but
-	   we know that the src and dest are 32-bit aligned so we can use
+	   we know that the src and dest are 64-bit aligned so we can use
 	   LDRD/STRD to improve efficiency.  */
 	/* TMP2 is now negative, but we don't care about that.  The bottom
 	   six bits still tell us how many bytes are left to copy.  */
