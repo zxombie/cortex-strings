@@ -25,7 +25,7 @@ HAS = {
     'bionic-a15': 'memcmp memcpy memset strcmp strcpy strlen',
     'bionic-c': ALL,
     'csl': 'memcpy memset',
-    'glibc': 'memcpy memset strlen',
+    'glibc': 'memcpy memset strchr strlen',
     'glibc-c': ALL,
     'newlib': 'memcpy strcmp strcpy strlen',
     'newlib-c': ALL,

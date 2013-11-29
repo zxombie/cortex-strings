@@ -240,6 +240,7 @@ libcsl_a_SOURCES = \
 libglibc_a_SOURCES = \
 	reference/glibc/memcpy.S \
 	reference/glibc/memset.S \
+	reference/glibc/strchr.S \
 	reference/glibc/strlen.S
 
 libnewlib_a_SOURCES = \
