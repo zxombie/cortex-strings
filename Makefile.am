@@ -211,7 +211,8 @@ libcortex_strings_la_SOURCES = \
 	src/linaro-a9/strchr.S \
 	src/thumb-2/strlen.S \
 	src/linaro-a9/memset.S \
-	src/linaro-a9/memcpy.S
+	src/linaro-a9/memcpy.S \
+	src/linaro-a9/strcmp.S
 
 # Libraries containing the difference reference versions
 libbionic_a9_a_SOURCES = \
