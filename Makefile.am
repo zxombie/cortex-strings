@@ -131,7 +131,6 @@ libglibc_c_a_SOURCES = \
 	reference/glibc-c/strcpy.c \
 	reference/glibc-c/strlen.c \
 	reference/glibc-c/wordcopy.c \
-	reference/glibc-c/bp-checks.h \
 	reference/glibc-c/memcopy.h \
 	reference/glibc-c/pagecopy.h
 
