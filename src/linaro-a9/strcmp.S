@@ -153,14 +153,14 @@
 	.text
 	.p2align	5
 .Lstrcmp_start_addr:
-#if STRCMP_NO_PRECHECK
+#if STRCMP_NO_PRECHECK == 0
 .Lfastpath_exit:
 	sub	r0, r2, r3
 	bx	lr
 	nop
 #endif
 def_fn	strcmp
-#if STRCMP_NO_PRECHECK
+#if STRCMP_NO_PRECHECK == 0
 	ldrb	r2, [src1]
 	ldrb	r3, [src2]
 	cmp	r2, #1
@@ -302,7 +302,7 @@ def_fn	strcmp
 	beq	.Laligned_m2
 	bcs	.Laligned_m1
 
-#if STRCMP_NO_PRECHECK
+#if STRCMP_NO_PRECHECK == 1
 	ldrb	data2, [src2, #1]
 	uxtb	tmp1, data1, ror #BYTE1_OFFSET
 	subs	tmp1, tmp1, data2
@@ -347,7 +347,7 @@ def_fn	strcmp
 	.cfi_restore 4
 	bx	lr
 
-#if STRCMP_NO_PRECHECK
+#if STRCMP_NO_PRECHECK == 0
 .Laligned_m1:
 	add	src2, src2, #4
 #endif
