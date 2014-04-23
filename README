@@ -26,7 +26,7 @@ as GLIBC, Bionic, and Newlib.  Your system may already include them!
 The src directory contains different variants organised by the
 implementation they run on and optional features used.  For example:
   * src/thumb-2  contains generic non-NEON routines for AArch32 (with Thumb-2).
-  * src/linaro-a9  contains tuned routines for Cortex-A9 processors.
+  * src/arm  contains tuned routines for Cortex-A class processors.
   * src/aarch64  contains generic routines for AArch64.
 
 == Reference versions ==

@@ -206,12 +206,12 @@ noinst_LIBRARIES += \
 # Main library
 libcortex_strings_la_SOURCES = \
 	src/thumb-2/strcpy.c \
-	src/linaro-a9/memchr.S \
-	src/linaro-a9/strchr.S \
+	src/arm/memchr.S \
+	src/arm/strchr.S \
 	src/thumb-2/strlen.S \
-	src/linaro-a9/memset.S \
-	src/linaro-a9/memcpy.S \
-	src/linaro-a9/strcmp.S
+	src/arm/memset.S \
+	src/arm/memcpy.S \
+	src/arm/strcmp.S
 
 # Libraries containing the difference reference versions
 libbionic_a9_a_SOURCES = \
