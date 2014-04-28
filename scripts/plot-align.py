@@ -48,8 +48,9 @@ def plot(records, bytes, function):
     axes.set_xticks(X + 0.5)
 
     pylab.title('Performance of different variants of %(function)s for %(bytes)d byte blocks' % locals())
+    pylab.xlabel('Alignment')
     pylab.ylabel('Rate (MB/s)')
-    pylab.legend(loc='upper left', ncol=3)
+    pylab.legend(loc='lower right', ncol=3)
     pylab.grid()
     pylab.savefig('alignment-%(function)s-%(bytes)d.png' % locals(), dpi=72)
 
