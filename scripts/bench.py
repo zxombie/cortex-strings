@@ -10,6 +10,7 @@ Results are generated for different values of:
  * Alignment
 """
 
+import argparse
 import subprocess
 import math
 import sys
@@ -48,6 +49,9 @@ ALIGNMENTS = {
     'strcmp': DUAL_BUFFER_ALIGNMENTS,
     'strcpy': DUAL_BUFFER_ALIGNMENTS,
 }
+
+VARIANTS = sorted(HAS.keys())
+FUNCTIONS = sorted(ALIGNMENTS.keys())
 
 NUM_RUNS = 5
 
@@ -125,11 +129,12 @@ def run_many(cache, variants, bytes, all_functions):
                             run_id)
 
 def run_top(cache):
-    variants = sorted(HAS.keys())
-    functions = sys.argv[1:]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--variants", nargs="+", help="library variant to run (run all if not specified)", default = VARIANTS, choices = VARIANTS)
+    parser.add_argument("-f", "--functions", nargs="+", help="function to run (run all if not specified)", default = FUNCTIONS, choices = FUNCTIONS)
+    parser.add_argument("-l", "--limit", type=int, help="upper limit to test to (in bytes)", default = 512*1024)
+    args = parser.parse_args()
 
-    # Upper limit in bytes to test to
-    top = 512*1024
     # Test all powers of 2
     step1 = 2.0
     # Test intermediate powers of 1.4
@@ -140,10 +145,10 @@ def run_top(cache):
     for step in [step1, step2]:
         if step:
             # Figure out how many steps get us up to the top
-            steps = int(round(math.log(top) / math.log(step)))
+            steps = int(round(math.log(args.limit) / math.log(step)))
             bytes.extend([int(step**x) for x in range(0, steps+1)])
 
-    run_many(cache, variants, bytes, functions)
+    run_many(cache, args.variants, bytes, args.functions)
 
 def main():
     cachename = 'cache.txt'
