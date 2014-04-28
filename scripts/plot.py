@@ -2,6 +2,8 @@
 current directory.
 """
 
+import libplot
+
 import fileinput
 import collections
 import pprint
@@ -65,6 +67,8 @@ def plot(records, field, scale, ylabel):
     variants = unique(records, 'variant')
     tests = unique(records, 'test')
 
+    colours = libplot.make_colours()
+
     # A little hack.  We want the 'all' record to be drawn last so
     # that it's obvious on the graph.  Assume that no tests come
     # before it alphabetically
@@ -86,7 +90,8 @@ def plot(records, field, scale, ylabel):
                     pylab.scatter(V[:,0], V[:,1]/scale, label=variant)
                     pylab.plot(V[:,0], V[:,1]/scale)
                 else:
-                    pylab.plot(V[:,0], V[:,1]/scale, label=variant, zorder=order)
+                    pylab.plot(V[:,0], V[:,1]/scale, label=variant,
+                            zorder=order, c = colours.next())
 
             except Exception, ex:
                 # michaelh1 likes to run this script while the test is

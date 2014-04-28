@@ -18,7 +18,7 @@ def plot(records, bytes):
     X = pylab.arange(len(functions))
     width = 1.0/(len(variants)+1)
 
-    colours = iter('bgrcmyk')
+    colours = libplot.make_colours()
 
     pylab.figure(1).set_size_inches((16, 12))
     pylab.clf()
