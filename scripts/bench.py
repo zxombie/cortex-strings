@@ -21,7 +21,7 @@ build = '../build/try-'
 ALL = 'memchr memcmp memcpy memset strchr strcmp strcpy strlen'
 
 HAS = {
-    'this': 'bounce memchr memcpy memset strchr strcpy strlen',
+    'this': 'bounce memchr memcpy memset strchr strcmp strcpy strlen',
     'bionic-a9': 'memcmp memcpy memset strcmp strcpy strlen',
     'bionic-a15': 'memcmp memcpy memset strcmp strcpy strlen',
     'bionic-c': ALL,
