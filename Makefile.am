@@ -284,6 +284,7 @@ endif
 if HOST_AARCH64
 
 libcortex_strings_la_SOURCES = \
+	src/aarch64/memchr.S \
 	src/aarch64/memcmp.S \
 	src/aarch64/memcpy.S \
 	src/aarch64/memmove.S \
