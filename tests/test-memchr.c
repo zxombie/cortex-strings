@@ -191,6 +191,11 @@ test_main (void)
     }
 
   do_random_tests ();
+
+  /* Test for behaviour with zero length.  */
+  FOR_EACH_IMPL (impl, 0)
+    do_one_test (impl, NULL, 'a', 0, NULL);
+
   return ret;
 }
 
