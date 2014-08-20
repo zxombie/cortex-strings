@@ -76,6 +76,8 @@
 	.endm
 
 def_fn memchr
+	/* Do not dereference srcin if no bytes to compare.  */
+	cbz	cntin, .Lzero_length
 	/*
 	 * Magic constant 0x40100401 allows us to identify which lane matches
 	 * the requested byte.
@@ -161,6 +163,10 @@ def_fn memchr
 	add	result, src, synd, lsr #1
 	/* Select result or NULL */
 	csel	result, xzr, result, eq
+	ret
+
+.Lzero_length:
+	mov	result, #0
 	ret
 
 	.size	memchr, . - memchr
