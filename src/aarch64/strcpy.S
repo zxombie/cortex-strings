@@ -217,4 +217,3 @@ def_fn strcpy p2align=6
 	b	.Lfirst_pass
 
 	.size	strcpy, . - strcpy
-#endif
